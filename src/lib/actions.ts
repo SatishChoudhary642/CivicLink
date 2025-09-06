@@ -84,4 +84,5 @@ export async function createIssue(values: z.infer<typeof FormSchema>) {
     issues.unshift(newIssue);
     
     revalidatePath('/');
+    redirect('/');
 }

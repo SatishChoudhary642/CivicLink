@@ -108,7 +108,6 @@ export function ReportForm() {
       try {
         await createIssue(data)
         toast({ title: "Report Submitted!", description: "Thank you for your contribution." });
-        router.push('/');
       } catch (err) {
          toast({ variant: "destructive", title: "Submission Error", description: "Something went wrong." });
       }
