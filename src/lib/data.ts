@@ -39,7 +39,7 @@ export const issues: Issue[] = [
     description: 'A very large and dangerous pothole has formed in the middle of Main Street near the intersection with Oak Ave. It has already caused a flat tire on my car.',
     category: 'Pothole',
     status: 'Open',
-    imageUrl: 'https://picsum.photos/600/400',
+    imageUrl: 'https://picsum.photos/seed/pothole/600/400',
     imageHint: 'pothole road',
     location: {
       lat: 34.0522,
@@ -60,7 +60,7 @@ export const issues: Issue[] = [
     description: 'The main wall of the central park has been vandalized with spray paint. It is an eyesore for the community.',
     category: 'Graffiti',
     status: 'In Progress',
-    imageUrl: 'https://picsum.photos/600/401',
+    imageUrl: 'https://picsum.photos/seed/graffiti/600/400',
     imageHint: 'graffiti wall',
     location: {
       lat: 34.055,
@@ -81,7 +81,7 @@ export const issues: Issue[] = [
     description: 'The stop sign at the corner of Elm and 5th has been knocked down. This is a very dangerous intersection for children walking to school.',
     category: 'Damaged Sign',
     status: 'Resolved',
-    imageUrl: 'https://picsum.photos/601/400',
+    imageUrl: 'https://picsum.photos/seed/sign/600/400',
     imageHint: 'stop sign',
     location: {
       lat: 34.05,
@@ -102,7 +102,7 @@ export const issues: Issue[] = [
     description: 'The streetlight at the pedestrian crossing has been out for three days. It is very dark and unsafe at night.',
     category: 'Streetlight Out',
     status: 'Open',
-    imageUrl: 'https://picsum.photos/600/402',
+    imageUrl: 'https://picsum.photos/seed/streetlight/600/400',
     imageHint: 'street light',
     location: {
       lat: 34.058,
