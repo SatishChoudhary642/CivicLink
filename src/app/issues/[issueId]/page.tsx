@@ -2,7 +2,7 @@
 
 import { issues as initialIssues } from "@/lib/data";
 import { users } from "@/lib/data";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -15,20 +15,16 @@ import { MessageSquare } from "lucide-react";
 import { useState } from "react";
 import type { Comment } from "@/lib/types";
 
-interface IssuePageParams {
-    params: {
-        issueId: string;
-    }
-}
-
 // In a real app, you would get the current user from your authentication system.
 const currentUserId = "user-1";
 const currentUser = users.find(u => u.id === currentUserId)!;
 
 
-export default function IssuePage({ params }: IssuePageParams) {
+export default function IssuePage() {
+  const params = useParams();
+  const issueId = params.issueId as string;
   const [issues, setIssues] = useState(initialIssues);
-  const issue = issues.find(i => i.id === params.issueId);
+  const issue = issues.find(i => i.id === issueId);
   const [newComment, setNewComment] = useState("");
 
   if (!issue) {
