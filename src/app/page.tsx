@@ -1,13 +1,19 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { issues } from '@/lib/data';
+import { issues as initialIssues } from '@/lib/data';
+import type { Issue } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowBigDown, ArrowBigUp, MessageSquare } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 export default function Home() {
+  const [issues, setIssues] = useState<Issue[]>(initialIssues);
+
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'Open':
@@ -21,6 +27,26 @@ export default function Home() {
       default:
         return 'outline';
     }
+  };
+
+  const handleVote = (issueId: string, type: 'up' | 'down') => {
+    setIssues(
+      issues.map((issue) => {
+        if (issue.id === issueId) {
+          const otherType = type === 'up' ? 'down' : 'up';
+          // In a real app, you'd also track if a user has already voted.
+          // This is a simplified implementation.
+          return {
+            ...issue,
+            votes: {
+              ...issue.votes,
+              [type]: issue.votes[type] + 1,
+            },
+          };
+        }
+        return issue;
+      })
+    );
   };
 
   return (
@@ -37,51 +63,69 @@ export default function Home() {
           {issues.map((issue) => (
             <Card key={issue.id} className="flex transition-shadow hover:shadow-md">
               <div className="flex flex-col items-center p-2 sm:p-4 bg-muted/50 border-r">
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-1 text-muted-foreground hover:text-primary">
-                    <ArrowBigUp className="h-5 w-5" />
-                  </Button>
-                  <span className="font-bold text-sm my-1">{issue.votes.up - issue.votes.down}</span>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-1 text-muted-foreground hover:text-blue-600">
-                    <ArrowBigDown className="h-5 w-5" />
-                  </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-1 text-muted-foreground hover:text-primary"
+                  onClick={() => handleVote(issue.id, 'up')}
+                >
+                  <ArrowBigUp className="h-5 w-5" />
+                </Button>
+                <span className="font-bold text-sm my-1">{issue.votes.up - issue.votes.down}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-1 text-muted-foreground hover:text-blue-600"
+                  onClick={() => handleVote(issue.id, 'down')}
+                >
+                  <ArrowBigDown className="h-5 w-5" />
+                </Button>
               </div>
-              <div className='flex-1'>
+              <div className="flex-1">
                 <CardContent className="p-4">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                      <Link href={`/profile/${issue.reporter.id}`}>
-                        <Avatar className="h-5 w-5">
-                          <AvatarImage src={issue.reporter.avatarUrl} alt={issue.reporter.name} />
-                          <AvatarFallback>{issue.reporter.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                    <Link href={`/profile/${issue.reporter.id}`}>
+                      <Avatar className="h-5 w-5">
+                        <AvatarImage src={issue.reporter.avatarUrl} alt={issue.reporter.name} />
+                        <AvatarFallback>{issue.reporter.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    </Link>
+                    <span>
+                      Posted by{' '}
+                      <Link href={`/profile/${issue.reporter.id}`} className="hover:underline">
+                        {issue.reporter.name}
                       </Link>
-                      <span>Posted by <Link href={`/profile/${issue.reporter.id}`} className="hover:underline">{issue.reporter.name}</Link></span>
-                      <span>&bull;</span>
-                      <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
-                    </div>
-
-                    <h3 className="text-lg font-semibold mb-2">{issue.title}</h3>
-                    
-                    <div className="relative h-64 w-full rounded-md overflow-hidden bg-muted mb-4">
-                        <Image
-                            src={issue.imageUrl}
-                            alt={issue.title}
-                            fill
-                            className="object-cover"
-                            data-ai-hint={issue.imageHint}
-                        />
-                    </div>
+                    </span>
+                    <span>&bull;</span>
+                    <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
+                  </div>
                   
-                    <div className="flex items-center justify-between">
-                        <div className='flex items-center gap-2'>
-                            <Button variant="ghost" size="sm">
-                                <MessageSquare className="h-4 w-4 mr-2" />
-                                <span className='text-xs'>Comments</span>
-                            </Button>
-                             <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
-                        </div>
-                         <p className="text-sm text-muted-foreground">{issue.location.address}</p>
-                    </div>
+                  <Link href={`/issues/${issue.id}`} className="block">
+                    <h3 className="text-lg font-semibold mb-2 hover:underline">{issue.title}</h3>
 
+                    <div className="relative h-64 w-full rounded-md overflow-hidden bg-muted mb-4">
+                      <Image
+                        src={issue.imageUrl}
+                        alt={issue.title}
+                        fill
+                        className="object-cover"
+                        data-ai-hint={issue.imageHint}
+                      />
+                    </div>
+                  </Link>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm" asChild>
+                            <Link href={`/issues/${issue.id}`}>
+                                <MessageSquare className="h-4 w-4 mr-2" />
+                                <span className="text-xs">Comments</span>
+                            </Link>
+                        </Button>
+                      <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{issue.location.address}</p>
+                  </div>
                 </CardContent>
               </div>
             </Card>
