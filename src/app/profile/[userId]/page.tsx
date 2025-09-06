@@ -1,16 +1,15 @@
+'use client';
+
 import { issues, users } from "@/lib/data";
-import type { Issue, User } from "@/lib/types";
+import type { Issue } from "@/lib/types";
 import { UserProfile } from "@/components/profile/UserProfile";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 
-interface ProfilePageParams {
-    params: {
-        userId: string;
-    }
-}
+export default function ProfilePage() {
+  const params = useParams();
+  const userId = params.userId as string;
+  const user = users.find(u => u.id === userId);
 
-export default function ProfilePage({ params }: ProfilePageParams) {
-  const user = users.find(u => u.id === params.userId);
   if (!user) {
     notFound();
   }
