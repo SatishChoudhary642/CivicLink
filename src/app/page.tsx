@@ -34,37 +34,30 @@ export default function Home() {
 
   const handleVote = (issueId: string, voteType: 'up' | 'down') => {
     const currentVote = userVotes[issueId];
-    let newVoteStatus: VoteStatus = null;
-    let voteChange = { up: 0, down: 0 };
+    let newVoteStatus: VoteStatus = voteType;
+    let newIssues = [...issues];
+    const issueIndex = newIssues.findIndex((issue) => issue.id === issueId);
+    if (issueIndex === -1) return;
+
+    const issue = newIssues[issueIndex];
+    const voteCount = { ...issue.votes };
 
     if (currentVote === voteType) {
-      // User is undoing their vote
+      // Undoing vote
       newVoteStatus = null;
-      voteChange[voteType] = -1;
+      if (voteType === 'up') voteCount.up--;
+      else voteCount.down--;
     } else {
       // New vote or changing vote
-      newVoteStatus = voteType;
-      voteChange[voteType] = 1;
-      if (currentVote) {
-        // Changing from up to down or vice versa
-        voteChange[currentVote] = -1;
-      }
+      if (voteType === 'up') voteCount.up++;
+      else voteCount.down++;
+
+      if (currentVote === 'up') voteCount.up--;
+      if (currentVote === 'down') voteCount.down--;
     }
 
-    setIssues(
-      issues.map((issue) => {
-        if (issue.id === issueId) {
-          return {
-            ...issue,
-            votes: {
-              up: issue.votes.up + voteChange.up,
-              down: issue.votes.down + voteChange.down,
-            },
-          };
-        }
-        return issue;
-      })
-    );
+    newIssues[issueIndex] = { ...issue, votes: voteCount };
+    setIssues(newIssues);
 
     setUserVotes({
       ...userVotes,
