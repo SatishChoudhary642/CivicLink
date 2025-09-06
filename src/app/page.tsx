@@ -92,21 +92,19 @@ export default function Home() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-1 text-muted-foreground data-[active=true]:text-green-600 hover:text-green-600"
-                  data-active={userVotes[issue.id] === 'up'}
+                  className="h-8 w-8 p-1 text-muted-foreground hover:text-green-600"
                   onClick={() => handleVote(issue.id, 'up')}
                 >
-                  <ArrowBigUp className="h-5 w-5" />
+                  <ArrowBigUp className={`h-5 w-5 ${userVotes[issue.id] === 'up' ? 'fill-green-600 text-green-600' : ''}`} />
                 </Button>
                 <span className="font-bold text-sm my-1">{issue.votes.up - issue.votes.down}</span>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-1 text-muted-foreground data-[active=true]:text-red-600 hover:text-red-600"
-                  data-active={userVotes[issue.id] === 'down'}
+                  className="h-8 w-8 p-1 text-muted-foreground hover:text-red-600"
                   onClick={() => handleVote(issue.id, 'down')}
                 >
-                  <ArrowBigDown className="h-5 w-5" />
+                  <ArrowBigDown className={`h-5 w-5 ${userVotes[issue.id] === 'down' ? 'fill-red-600 text-red-600' : ''}`} />
                 </Button>
               </div>
               <div className="flex-1">
