@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { issues } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -47,11 +48,13 @@ export default function Home() {
               <div className='flex-1'>
                 <CardContent className="p-4">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                      <Avatar className="h-5 w-5">
-                        <AvatarImage src={issue.reporter.avatarUrl} alt={issue.reporter.name} />
-                        <AvatarFallback>{issue.reporter.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <span>Posted by {issue.reporter.name}</span>
+                      <Link href={`/profile/${issue.reporter.id}`}>
+                        <Avatar className="h-5 w-5">
+                          <AvatarImage src={issue.reporter.avatarUrl} alt={issue.reporter.name} />
+                          <AvatarFallback>{issue.reporter.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                      </Link>
+                      <span>Posted by <Link href={`/profile/${issue.reporter.id}`} className="hover:underline">{issue.reporter.name}</Link></span>
                       <span>&bull;</span>
                       <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
                     </div>
