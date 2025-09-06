@@ -28,13 +28,14 @@ import Image from 'next/image';
 import { Camera, Loader2, MapPin } from 'lucide-react';
 import { getCategoryForImage, createIssue } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 const FormSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
   category: z.string({ required_error: "Please select a category." }),
   location: z.string().min(3, { message: "Please provide a location." }),
-  photoUrl: z.string().optional(),
+  photoDataUri: z.string().optional(),
 });
 
 export function ReportForm() {
@@ -43,6 +44,7 @@ export function ReportForm() {
   const [isLocating, setIsLocating] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -60,20 +62,23 @@ export function ReportForm() {
       reader.onloadend = async () => {
         const dataUri = reader.result as string;
         setImagePreview(dataUri);
-        form.setValue('photoUrl', '...placeholder...'); // a pseudo-value to pass validation
+        form.setValue('photoDataUri', dataUri);
         setIsCategorizing(true);
-        const result = await getCategoryForImage(dataUri);
-        setIsCategorizing(false);
-        if (result.category) {
-          const matchingCategory = issueCategories.find(cat => cat.toLowerCase().includes(result.category.toLowerCase()));
-          if (matchingCategory) {
-            form.setValue('category', matchingCategory);
-            toast({ title: "Image Categorized!", description: `We think this is a "${matchingCategory}".` });
-          } else {
-             toast({ title: "Image Categorized!", description: `AI suggested: "${result.category}". Please select the closest match.` });
+        try {
+          const result = await getCategoryForImage(dataUri);
+          if (result.category) {
+            const matchingCategory = issueCategories.find(cat => cat.toLowerCase().includes(result.category.toLowerCase()));
+            if (matchingCategory) {
+              form.setValue('category', matchingCategory);
+              toast({ title: "Image Categorized!", description: `We think this is a "${matchingCategory}".` });
+            } else {
+               toast({ title: "Image Categorized!", description: `AI suggested: "${result.category}". Please select the closest match.` });
+            }
+          } else if(result.error) {
+             toast({ variant: "destructive", title: "Categorization Failed", description: result.error });
           }
-        } else if(result.error) {
-           toast({ variant: "destructive", title: "Categorization Failed", description: result.error });
+        } finally {
+          setIsCategorizing(false);
         }
       };
       reader.readAsDataURL(file);
@@ -99,10 +104,14 @@ export function ReportForm() {
   };
   
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    startTransition(() => {
-      createIssue(data).catch((err) => {
+    startTransition(async () => {
+      try {
+        await createIssue(data)
+        toast({ title: "Report Submitted!", description: "Thank you for your contribution." });
+        router.push('/');
+      } catch (err) {
          toast({ variant: "destructive", title: "Submission Error", description: "Something went wrong." });
-      });
+      }
     });
   }
 
@@ -111,7 +120,7 @@ export function ReportForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="photoUrl"
+          name="photoDataUri"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Issue Photo</FormLabel>
@@ -221,7 +230,7 @@ export function ReportForm() {
           )}
         />
         
-        <Button type="submit" className="w-full" disabled={isPending || isCategorizing}>
+        <Button type="submit" className="w-full" disabled={isPending || isCategorizing || !form.formState.isValid || !imagePreview}>
           {(isPending || isCategorizing) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Submit Report
         </Button>
