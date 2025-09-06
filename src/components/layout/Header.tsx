@@ -25,10 +25,10 @@ export default function Header() {
             Report an Issue
           </Link>
           <Link
-            href="/admin"
+            href="/my-reports"
             className="text-foreground/60 transition-colors hover:text-foreground/80"
           >
-            Admin
+            My Reports
           </Link>
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
@@ -61,10 +61,10 @@ export default function Header() {
                   Report an Issue
                 </Link>
                 <Link
-                  href="/admin"
+                  href="/my-reports"
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  Admin
+                  My Reports
                 </Link>
               </nav>
             </SheetContent>
