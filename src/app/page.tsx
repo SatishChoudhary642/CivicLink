@@ -11,8 +11,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 
+type VoteStatus = 'up' | 'down' | null;
+
 export default function Home() {
   const [issues, setIssues] = useState<Issue[]>(initialIssues);
+  const [userVotes, setUserVotes] = useState<Record<string, VoteStatus>>({});
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -29,24 +32,44 @@ export default function Home() {
     }
   };
 
-  const handleVote = (issueId: string, type: 'up' | 'down') => {
+  const handleVote = (issueId: string, voteType: 'up' | 'down') => {
+    const currentVote = userVotes[issueId];
+    let newVoteStatus: VoteStatus = null;
+    let voteChange = { up: 0, down: 0 };
+
+    if (currentVote === voteType) {
+      // User is undoing their vote
+      newVoteStatus = null;
+      voteChange[voteType] = -1;
+    } else {
+      // New vote or changing vote
+      newVoteStatus = voteType;
+      voteChange[voteType] = 1;
+      if (currentVote) {
+        // Changing from up to down or vice versa
+        voteChange[currentVote] = -1;
+      }
+    }
+
     setIssues(
       issues.map((issue) => {
         if (issue.id === issueId) {
-          const otherType = type === 'up' ? 'down' : 'up';
-          // In a real app, you'd also track if a user has already voted.
-          // This is a simplified implementation.
           return {
             ...issue,
             votes: {
-              ...issue.votes,
-              [type]: issue.votes[type] + 1,
+              up: issue.votes.up + voteChange.up,
+              down: issue.votes.down + voteChange.down,
             },
           };
         }
         return issue;
       })
     );
+
+    setUserVotes({
+      ...userVotes,
+      [issueId]: newVoteStatus,
+    });
   };
 
   return (
@@ -66,7 +89,8 @@ export default function Home() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-1 text-muted-foreground hover:text-primary"
+                  className="h-8 w-8 p-1 text-muted-foreground data-[active=true]:text-primary hover:text-primary"
+                  data-active={userVotes[issue.id] === 'up'}
                   onClick={() => handleVote(issue.id, 'up')}
                 >
                   <ArrowBigUp className="h-5 w-5" />
@@ -75,7 +99,8 @@ export default function Home() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-1 text-muted-foreground hover:text-blue-600"
+                  className="h-8 w-8 p-1 text-muted-foreground data-[active=true]:text-blue-600 hover:text-blue-600"
+                  data-active={userVotes[issue.id] === 'down'}
                   onClick={() => handleVote(issue.id, 'down')}
                 >
                   <ArrowBigDown className="h-5 w-5" />
