@@ -42,18 +42,28 @@ export default function Home() {
     const issue = newIssues[issueIndex];
     const voteCount = { ...issue.votes };
 
+    // If current vote is same as new vote, undo it.
     if (currentVote === voteType) {
-      // Undoing vote
       newVoteStatus = null;
-      if (voteType === 'up') voteCount.up--;
-      else voteCount.down--;
+      if (voteType === 'up') {
+        voteCount.up--;
+      } else {
+        voteCount.down--;
+      }
     } else {
-      // New vote or changing vote
-      if (voteType === 'up') voteCount.up++;
-      else voteCount.down++;
-
-      if (currentVote === 'up') voteCount.up--;
-      if (currentVote === 'down') voteCount.down--;
+      // If there was a previous vote, undo its effect
+      if (currentVote === 'up') {
+        voteCount.up--;
+      } else if (currentVote === 'down') {
+        voteCount.down--;
+      }
+      
+      // Apply the new vote
+      if (voteType === 'up') {
+        voteCount.up++;
+      } else {
+        voteCount.down++;
+      }
     }
 
     newIssues[issueIndex] = { ...issue, votes: voteCount };
@@ -82,7 +92,7 @@ export default function Home() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-1 text-muted-foreground data-[active=true]:text-primary hover:text-primary"
+                  className="h-8 w-8 p-1 text-muted-foreground data-[active=true]:text-green-600 hover:text-green-600"
                   data-active={userVotes[issue.id] === 'up'}
                   onClick={() => handleVote(issue.id, 'up')}
                 >
@@ -92,7 +102,7 @@ export default function Home() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-1 text-muted-foreground data-[active=true]:text-blue-600 hover:text-blue-600"
+                  className="h-8 w-8 p-1 text-muted-foreground data-[active=true]:text-red-600 hover:text-red-600"
                   data-active={userVotes[issue.id] === 'down'}
                   onClick={() => handleVote(issue.id, 'down')}
                 >
