@@ -28,7 +28,6 @@ import Image from 'next/image';
 import { Camera, Loader2, MapPin } from 'lucide-react';
 import { getCategoryForImage, createIssue } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
 
 const FormSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
@@ -44,7 +43,6 @@ export function ReportForm() {
   const [isLocating, setIsLocating] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
