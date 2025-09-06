@@ -19,12 +19,6 @@ export default function Header() {
             Dashboard
           </Link>
           <Link
-            href="/report"
-            className="text-foreground/60 transition-colors hover:text-foreground/80"
-          >
-            Report an Issue
-          </Link>
-          <Link
             href="/my-reports"
             className="text-foreground/60 transition-colors hover:text-foreground/80"
           >
@@ -59,12 +53,6 @@ export default function Header() {
                 </Link>
                 <Link href="/" className="hover:text-foreground">
                   Dashboard
-                </Link>
-                <Link
-                  href="/report"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  Report an Issue
                 </Link>
                 <Link
                   href="/my-reports"
