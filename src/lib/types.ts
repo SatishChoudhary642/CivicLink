@@ -10,6 +10,13 @@ export type User = {
   civicScore: number;
 };
 
+export type Comment = {
+  id: string;
+  text: string;
+  user: User;
+  createdAt: string;
+};
+
 export type Issue = {
   id: string;
   title: string;
@@ -29,4 +36,5 @@ export type Issue = {
   };
   createdAt: string;
   reporter: User;
+  comments: Comment[];
 };

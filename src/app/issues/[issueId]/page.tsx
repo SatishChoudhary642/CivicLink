@@ -1,4 +1,7 @@
-import { issues } from "@/lib/data";
+'use client';
+
+import { issues as initialIssues } from "@/lib/data";
+import { users } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +12,8 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
+import { useState } from "react";
+import type { Comment } from "@/lib/types";
 
 interface IssuePageParams {
     params: {
@@ -16,8 +21,15 @@ interface IssuePageParams {
     }
 }
 
+// In a real app, you would get the current user from your authentication system.
+const currentUserId = "user-1";
+const currentUser = users.find(u => u.id === currentUserId)!;
+
+
 export default function IssuePage({ params }: IssuePageParams) {
+  const [issues, setIssues] = useState(initialIssues);
   const issue = issues.find(i => i.id === params.issueId);
+  const [newComment, setNewComment] = useState("");
 
   if (!issue) {
     notFound();
@@ -32,6 +44,30 @@ export default function IssuePage({ params }: IssuePageParams) {
       default: return 'outline';
     }
   };
+
+  const handlePostComment = () => {
+    if (!newComment.trim()) return;
+
+    const comment: Comment = {
+        id: `comment-${Date.now()}`,
+        text: newComment,
+        user: currentUser,
+        createdAt: new Date().toISOString(),
+    };
+    
+    const updatedIssues = issues.map(i => {
+        if (i.id === issue.id) {
+            return {
+                ...i,
+                comments: [...i.comments, comment]
+            }
+        }
+        return i;
+    });
+
+    setIssues(updatedIssues);
+    setNewComment("");
+  }
 
   return (
     <div className="container mx-auto max-w-3xl p-4 md:p-8">
@@ -71,20 +107,43 @@ export default function IssuePage({ params }: IssuePageParams) {
                 <div className="space-y-6">
                     <h3 className="text-2xl font-semibold flex items-center gap-2">
                         <MessageSquare className="h-6 w-6" />
-                        Comments
+                        Comments ({issue.comments.length})
                     </h3>
                     
-                    {/* Add Comment Form */}
                     <div className="flex flex-col gap-2">
-                        <Textarea placeholder="Add your comment..." />
-                        <Button className="self-end">Post Comment</Button>
+                        <Textarea 
+                            placeholder="Add your comment..." 
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                        />
+                        <Button className="self-end" onClick={handlePostComment} disabled={!newComment.trim()}>Post Comment</Button>
                     </div>
 
-                    {/* Placeholder for comments */}
-                    <div className="border rounded-md p-4 text-center text-muted-foreground">
-                        <p>No comments yet. Be the first to share your thoughts!</p>
+                    <div className="space-y-4">
+                        {issue.comments.length > 0 ? (
+                            issue.comments.map(comment => (
+                                <div key={comment.id} className="flex gap-3">
+                                    <Link href={`/profile/${comment.user.id}`}>
+                                        <Avatar className="h-8 w-8">
+                                            <AvatarImage src={comment.user.avatarUrl} alt={comment.user.name} />
+                                            <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                    </Link>
+                                    <div className="flex-1">
+                                        <div className="text-sm">
+                                            <Link href={`/profile/${comment.user.id}`} className="font-semibold hover:underline">{comment.user.name}</Link>
+                                            <span className="text-muted-foreground ml-2 text-xs">{new Date(comment.createdAt).toLocaleDateString()}</span>
+                                        </div>
+                                        <p className="text-foreground/90 mt-1">{comment.text}</p>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                             <div className="border rounded-md p-4 text-center text-muted-foreground">
+                                <p>No comments yet. Be the first to share your thoughts!</p>
+                            </div>
+                        )}
                     </div>
-
                 </div>
             </CardContent>
         </Card>

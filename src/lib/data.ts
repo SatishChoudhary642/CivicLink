@@ -52,6 +52,7 @@ export const issues: Issue[] = [
     },
     createdAt: '2024-05-20T10:00:00Z',
     reporter: users[0],
+    comments: [],
   },
   {
     id: '2',
@@ -72,6 +73,7 @@ export const issues: Issue[] = [
     },
     createdAt: '2024-05-19T14:30:00Z',
     reporter: users[1],
+    comments: [],
   },
   {
     id: '3',
@@ -92,6 +94,7 @@ export const issues: Issue[] = [
     },
     createdAt: '2024-05-18T08:00:00Z',
     reporter: users[2],
+    comments: [],
   },
     {
     id: '4',
@@ -112,6 +115,7 @@ export const issues: Issue[] = [
     },
     createdAt: '2024-05-21T11:00:00Z',
     reporter: users[3],
+    comments: [],
   },
 ];
 
