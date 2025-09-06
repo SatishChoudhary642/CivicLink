@@ -82,7 +82,7 @@ export const issues: Issue[] = [
     category: 'Damaged Sign',
     status: 'Resolved',
     imageUrl: 'https://picsum.photos/seed/sign/600/400',
-    imageHint: 'stop sign',
+    imageHint: 'stop sign broken',
     location: {
       lat: 34.05,
       lng: -118.24,
@@ -103,7 +103,7 @@ export const issues: Issue[] = [
     category: 'Streetlight Out',
     status: 'Open',
     imageUrl: 'https://picsum.photos/seed/streetlight/600/400',
-    imageHint: 'street light',
+    imageHint: 'street light dark',
     location: {
       lat: 34.058,
       lng: -118.25,
