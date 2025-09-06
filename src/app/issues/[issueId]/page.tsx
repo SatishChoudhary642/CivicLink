@@ -14,15 +14,12 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
 import { useState } from "react";
 import type { Comment } from "@/lib/types";
-
-// In a real app, you would get the current user from your authentication system.
-const currentUserId = "user-1";
-const currentUser = users.find(u => u.id === currentUserId)!;
-
+import { useAuth } from "@/context/AuthContext";
 
 export default function IssuePage() {
   const params = useParams();
   const issueId = params.issueId as string;
+  const { user } = useAuth();
   const [issues, setIssues] = useState(initialIssues);
   const issue = issues.find(i => i.id === issueId);
   const [newComment, setNewComment] = useState("");
@@ -30,6 +27,10 @@ export default function IssuePage() {
   if (!issue) {
     notFound();
   }
+
+  // In a real app, you would get the current user from your authentication system.
+  // We get it from the AuthContext now, but need to find the full user object from the users list
+  const currentUser = user ? users.find(u => u.id === user.id) : null;
   
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -42,7 +43,7 @@ export default function IssuePage() {
   };
 
   const handlePostComment = () => {
-    if (!newComment.trim()) return;
+    if (!newComment.trim() || !currentUser) return;
 
     const comment: Comment = {
         id: `comment-${Date.now()}`,
@@ -106,14 +107,23 @@ export default function IssuePage() {
                         Comments ({issue.comments.length})
                     </h3>
                     
-                    <div className="flex flex-col gap-2">
-                        <Textarea 
-                            placeholder="Add your comment..." 
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                        />
-                        <Button className="self-end" onClick={handlePostComment} disabled={!newComment.trim()}>Post Comment</Button>
-                    </div>
+                    {user ? (
+                        <div className="flex flex-col gap-2">
+                            <Textarea 
+                                placeholder="Add your comment..." 
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                            />
+                            <Button className="self-end" onClick={handlePostComment} disabled={!newComment.trim()}>Post Comment</Button>
+                        </div>
+                    ) : (
+                        <div className="border rounded-md p-4 text-center text-muted-foreground">
+                            <p>
+                                <Link href="/login" className="text-primary hover:underline">Log in</Link> to join the discussion.
+                            </p>
+                        </div>
+                    )}
+
 
                     <div className="space-y-4">
                         {issue.comments.length > 0 ? (

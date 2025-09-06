@@ -10,12 +10,14 @@ import { ArrowBigDown, ArrowBigUp, MessageSquare } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
 type VoteStatus = 'up' | 'down' | null;
 
 export default function Home() {
   const [issues, setIssues] = useState<Issue[]>(initialIssues);
   const [userVotes, setUserVotes] = useState<Record<string, VoteStatus>>({});
+  const { user } = useAuth();
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -94,6 +96,7 @@ export default function Home() {
                   size="sm"
                   className="h-8 w-8 p-1 text-muted-foreground hover:text-green-600"
                   onClick={() => handleVote(issue.id, 'up')}
+                  disabled={!user}
                 >
                   <ArrowBigUp className={`h-5 w-5 ${userVotes[issue.id] === 'up' ? 'fill-green-600 text-green-600' : ''}`} />
                 </Button>
@@ -103,6 +106,7 @@ export default function Home() {
                   size="sm"
                   className="h-8 w-8 p-1 text-muted-foreground hover:text-red-600"
                   onClick={() => handleVote(issue.id, 'down')}
+                  disabled={!user}
                 >
                   <ArrowBigDown className={`h-5 w-5 ${userVotes[issue.id] === 'down' ? 'fill-red-600 text-red-600' : ''}`} />
                 </Button>
