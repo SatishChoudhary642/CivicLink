@@ -2,6 +2,14 @@ export type IssueStatus = "Open" | "In Progress" | "Resolved" | "Rejected";
 
 export type IssueCategory = "Pothole" | "Graffiti" | "Damaged Sign" | "Streetlight Out" | "Trash Overflow" | "Other";
 
+export type User = {
+  id: string;
+  name: string;
+  avatarUrl: string;
+  karma: number;
+  civicScore: number;
+};
+
 export type Issue = {
   id: string;
   title: string;
@@ -20,8 +28,5 @@ export type Issue = {
     down: number;
   };
   createdAt: string;
-  reporter: {
-    name: string;
-    avatarUrl: string;
-  };
+  reporter: User;
 };

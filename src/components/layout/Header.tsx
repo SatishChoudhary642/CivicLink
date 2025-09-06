@@ -30,6 +30,12 @@ export default function Header() {
           >
             My Reports
           </Link>
+          <Link
+            href="/profile"
+            className="text-foreground/60 transition-colors hover:text-foreground/80"
+          >
+            Profile
+          </Link>
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
           <Button asChild>
@@ -65,6 +71,12 @@ export default function Header() {
                   className="text-muted-foreground hover:text-foreground"
                 >
                   My Reports
+                </Link>
+                <Link
+                  href="/profile"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Profile
                 </Link>
               </nav>
             </SheetContent>

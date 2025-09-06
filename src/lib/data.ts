@@ -1,4 +1,36 @@
-import type { Issue, IssueCategory } from './types';
+import type { Issue, IssueCategory, User } from './types';
+
+export const users: User[] = [
+  {
+    id: 'user-1',
+    name: 'Jane Doe',
+    avatarUrl: 'https://picsum.photos/seed/Jane/40/40',
+    karma: 0, // Will be calculated
+    civicScore: 0, // Will be calculated
+  },
+  {
+    id: 'user-2',
+    name: 'John Smith',
+    avatarUrl: 'https://picsum.photos/seed/John/40/40',
+    karma: 0,
+    civicScore: 0,
+  },
+    {
+    id: 'user-3',
+    name: 'Emily White',
+    avatarUrl: 'https://picsum.photos/seed/Emily/40/40',
+    karma: 0,
+    civicScore: 0,
+  },
+  {
+    id: 'user-4',
+    name: 'Michael Brown',
+    avatarUrl: 'https://picsum.photos/seed/Michael/40/40',
+    karma: 0,
+    civicScore: 0,
+  }
+];
+
 
 export const issues: Issue[] = [
   {
@@ -19,10 +51,7 @@ export const issues: Issue[] = [
       down: 1,
     },
     createdAt: '2024-05-20T10:00:00Z',
-    reporter: {
-        name: 'Jane Doe',
-        avatarUrl: 'https://picsum.photos/seed/Jane/40/40'
-    }
+    reporter: users[0],
   },
   {
     id: '2',
@@ -42,10 +71,7 @@ export const issues: Issue[] = [
       down: 0,
     },
     createdAt: '2024-05-19T14:30:00Z',
-    reporter: {
-        name: 'John Smith',
-        avatarUrl: 'https://picsum.photos/seed/John/40/40'
-    }
+    reporter: users[1],
   },
   {
     id: '3',
@@ -65,10 +91,7 @@ export const issues: Issue[] = [
       down: 0,
     },
     createdAt: '2024-05-18T08:00:00Z',
-    reporter: {
-        name: 'Emily White',
-        avatarUrl: 'https://picsum.photos/seed/Emily/40/40'
-    }
+    reporter: users[2],
   },
     {
     id: '4',
@@ -88,10 +111,7 @@ export const issues: Issue[] = [
       down: 0,
     },
     createdAt: '2024-05-21T11:00:00Z',
-    reporter: {
-        name: 'Michael Brown',
-        avatarUrl: 'https://picsum.photos/seed/Michael/40/40'
-    }
+    reporter: users[3],
   },
 ];
 
