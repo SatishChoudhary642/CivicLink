@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check for a logged-in user in localStorage on initial load
     setLoading(true);
     try {
-        const storedUser = localStorage.getItem('civiclink-user');
+        let storedUser = localStorage.getItem('civiclink-user');
         if (storedUser) {
             const parsedUser = JSON.parse(storedUser);
             if (parsedUser.id === 'admin') {
@@ -44,6 +44,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } else {
                 const foundUser = allUsers.find(u => u.id === parsedUser.id);
                 if (foundUser) setUser(foundUser);
+            }
+        } else {
+            // If no user is stored, default to the first user for easier development
+            const defaultUser = allUsers[0];
+            if (defaultUser) {
+                localStorage.setItem('civiclink-user', JSON.stringify(defaultUser));
+                setUser(defaultUser);
             }
         }
     } catch (error) {
