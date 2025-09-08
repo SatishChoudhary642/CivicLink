@@ -82,14 +82,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     
     // For prototype, we'll just find a user by email. Password isn't checked.
-    // Ensure we are checking against the most recent list of users.
-    const currentUsers = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
-    const foundUser = currentUsers.find((u: User) => u.name.toLowerCase().replace(' ', '.') + '@example.com' === email.toLowerCase());
+    const foundUser = allUsers.find((u: User) => u.name.toLowerCase().replace(/ /g, '.') + '@example.com' === email.toLowerCase());
 
     if (foundUser) {
       localStorage.setItem('civiclink-user', JSON.stringify(foundUser));
       setUser(foundUser);
-      setAllUsers(currentUsers); // Sync state
       setLoading(false);
       return foundUser;
     } else {
@@ -108,9 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    const currentUsers = allUsers;
-
-    const existingUser = currentUsers.find(u => u.name.toLowerCase().replace(' ', '.') + '@example.com' === email.toLowerCase());
+    const existingUser = allUsers.find(u => u.name.toLowerCase().replace(/ /g, '.') + '@example.com' === email.toLowerCase());
     if (existingUser) {
         setLoading(false);
         throw new Error("An account with this email already exists.");
@@ -124,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         civicScore: 0,
     };
     
-    const updatedUsers = [...currentUsers, newUser];
+    const updatedUsers = [...allUsers, newUser];
     setAllUsers(updatedUsers);
     localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedUsers));
     
