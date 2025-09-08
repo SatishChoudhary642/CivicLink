@@ -2,6 +2,9 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  // Disabling strict mode temporarily to debug Leaflet map issues.
+  // It's recommended to re-enable this.
+  reactStrictMode: false,
   typescript: {
     ignoreBuildErrors: true,
   },
