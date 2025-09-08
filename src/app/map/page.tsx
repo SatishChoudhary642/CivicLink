@@ -1,7 +1,6 @@
 'use client';
 
 import { issues } from '@/lib/data';
-import type { Issue } from '@/lib/types';
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 
