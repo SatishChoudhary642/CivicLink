@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User } from '@/lib/types';
-import { users as allUsers } from '@/lib/data';
+import { getInitialUsers } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface AuthContextType {
@@ -28,34 +28,43 @@ const adminCredentials = {
     password: '123'
 };
 
+const USERS_STORAGE_KEY = 'civiclink-users';
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for a logged-in user in localStorage on initial load
     setLoading(true);
     try {
+        // Load users from localStorage or use initial data
+        const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
+        const initialUsers = storedUsers ? JSON.parse(storedUsers) : getInitialUsers();
+        setAllUsers(initialUsers);
+
+        // Check for a logged-in user in localStorage on initial load
         let storedUser = localStorage.getItem('civiclink-user');
         if (storedUser) {
             const parsedUser = JSON.parse(storedUser);
             if (parsedUser.id === 'admin') {
                 setUser(adminUser);
             } else {
-                const foundUser = allUsers.find(u => u.id === parsedUser.id);
+                const foundUser = initialUsers.find((u: User) => u.id === parsedUser.id);
                 if (foundUser) setUser(foundUser);
             }
         } else {
             // If no user is stored, default to the first user for easier development
-            const defaultUser = allUsers[0];
+            const defaultUser = initialUsers[0];
             if (defaultUser) {
                 localStorage.setItem('civiclink-user', JSON.stringify(defaultUser));
                 setUser(defaultUser);
             }
         }
     } catch (error) {
-        console.error("Failed to parse user from localStorage", error);
+        console.error("Failed to initialize auth from localStorage", error);
         localStorage.removeItem('civiclink-user');
+        localStorage.removeItem(USERS_STORAGE_KEY);
     }
     setLoading(false);
   }, []);
@@ -110,15 +119,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         civicScore: 0,
     };
     
-    // In a real app, you'd save this to a database
-    allUsers.push(newUser);
+    const updatedUsers = [...allUsers, newUser];
+    setAllUsers(updatedUsers);
+    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedUsers));
     
     setLoading(false);
     return newUser;
   };
 
   // Display a loading skeleton while checking auth status
-  if (loading) {
+  if (loading && allUsers.length === 0) {
       return (
            <div className="flex min-h-screen flex-col">
               <header className="sticky top-0 z-50 w-full border-b bg-background/95">

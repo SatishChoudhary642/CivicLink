@@ -5,7 +5,7 @@ import { categorizeUploadedImage } from '@/ai/flows/categorize-uploaded-image';
 import { predictResolutionStatus } from '@/ai/flows/predict-resolution-status';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { issues, users } from './data';
+import { issues, getInitialUsers } from './data';
 import type { Issue, IssueCategory } from './types';
 
 
@@ -35,6 +35,7 @@ const currentUserId = "user-1";
 
 export async function createIssue(values: z.infer<typeof FormSchema>) {
     const validatedFields = FormSchema.safeParse(values);
+    const users = getInitialUsers();
 
     if (!validatedFields.success) {
         throw new Error('Invalid form data.');

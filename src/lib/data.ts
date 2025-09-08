@@ -1,6 +1,8 @@
 import type { Issue, IssueCategory, User } from './types';
 
-export const users: User[] = [
+// Use a function to return a fresh copy of the initial users,
+// preventing issues with module caching.
+export const getInitialUsers = (): User[] => [
   {
     id: 'user-1',
     name: 'Jane Doe',
@@ -31,6 +33,9 @@ export const users: User[] = [
   }
 ];
 
+// For simplicity in the prototype, we will manage users via AuthContext and localStorage.
+// We get a fresh copy to avoid module caching issues if we were to modify it directly.
+const users = getInitialUsers();
 
 export const issues: Issue[] = [
   {
@@ -51,7 +56,7 @@ export const issues: Issue[] = [
       down: 0,
     },
     createdAt: '2024-05-22T09:00:00Z',
-    reporter: users[0],
+    reporter: users.find(u => u.id === 'user-1')!,
     comments: [],
   },
   {
@@ -72,7 +77,7 @@ export const issues: Issue[] = [
       down: 1,
     },
     createdAt: '2024-05-21T18:00:00Z',
-    reporter: users[1],
+    reporter: users.find(u => u.id === 'user-2')!,
     comments: [],
   },
   {
@@ -93,7 +98,7 @@ export const issues: Issue[] = [
       down: 1,
     },
     createdAt: '2024-05-20T10:00:00Z',
-    reporter: users[0],
+    reporter: users.find(u => u.id === 'user-1')!,
     comments: [],
   },
   {
@@ -114,7 +119,7 @@ export const issues: Issue[] = [
       down: 0,
     },
     createdAt: '2024-05-19T14:30:00Z',
-    reporter: users[1],
+    reporter: users.find(u => u.id === 'user-2')!,
     comments: [],
   },
   {
@@ -135,7 +140,7 @@ export const issues: Issue[] = [
       down: 0,
     },
     createdAt: '2024-05-18T08:00:00Z',
-    reporter: users[2],
+    reporter: users.find(u => u.id === 'user-3')!,
     comments: [],
   },
     {
@@ -156,7 +161,7 @@ export const issues: Issue[] = [
       down: 0,
     },
     createdAt: '2024-05-21T11:00:00Z',
-    reporter: users[3],
+    reporter: users.find(u => u.id === 'user-4')!,
     comments: [],
   },
 ];

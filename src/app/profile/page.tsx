@@ -1,19 +1,26 @@
-import { issues, users } from "@/lib/data";
+'use client';
+
+import { issues, getInitialUsers } from "@/lib/data";
 import type { Issue, User } from "@/lib/types";
 import { UserProfile } from "@/components/profile/UserProfile";
-
-// In a real app, you would get the current user from your authentication system.
-const currentUserId = "user-1";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
-  const currentUser = users.find(u => u.id === currentUserId);
-  if (!currentUser) {
-    return <div className="container mx-auto p-8">User not found.</div>
-  }
+  const { user } = useAuth();
+  const router = useRouter();
 
-  const myIssues: Issue[] = issues.filter(issue => issue.reporter.id === currentUser.id);
+  if (!user) {
+    // Should not happen if page is protected, but as a fallback
+    router.push('/login');
+    return null;
+  }
+  
+  // In a real app, you might fetch user-specific data here.
+  // For the prototype, we filter the global issues list.
+  const myIssues: Issue[] = issues.filter(issue => issue.reporter.id === user.id);
 
   return (
-    <UserProfile user={currentUser} issues={myIssues} />
+    <UserProfile user={user} issues={myIssues} />
   );
 }

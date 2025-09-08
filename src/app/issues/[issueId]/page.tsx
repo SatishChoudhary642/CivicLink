@@ -1,7 +1,7 @@
 'use client';
 
 import { issues as initialIssues } from "@/lib/data";
-import { users } from "@/lib/data";
+import { getInitialUsers } from "@/lib/data";
 import { notFound, useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,6 +23,7 @@ export default function IssuePage() {
   const [issues, setIssues] = useState(initialIssues);
   const issue = issues.find(i => i.id === issueId);
   const [newComment, setNewComment] = useState("");
+  const users = getInitialUsers(); // In a real app, this would come from a context or API
 
   if (!issue) {
     notFound();
