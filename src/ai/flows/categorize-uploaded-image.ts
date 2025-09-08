@@ -17,7 +17,7 @@ const CategorizeUploadedImageInputSchema = z.object({
   photoDataUri: z
     .string()
     .describe(
-      'A photo to categorize, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.' 
+      'A photo to categorize, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.'
     ),
 });
 export type CategorizeUploadedImageInput = z.infer<
@@ -77,9 +77,10 @@ const prompt = ai.definePrompt({
   name: 'categorizeUploadedImagePrompt',
   input: {schema: CategorizeUploadedImageInputSchema},
   output: {schema: CategorizeUploadedImageOutputSchema},
+  model: 'googleai/gemini-2.5-flash',
   prompt: `You are an AI that categorizes images of civic issues.
 
-  Analyze the image and determine the most appropriate category for it from the list of valid categories. You MUST choose one of the categories from the list provided below.
+  Analyze the image and determine the most appropriate category for it. You MUST choose one of the categories from the list of valid categories provided below.
 
   Valid Categories:
   - ${validCategories.join('\n  - ')}
