@@ -19,6 +19,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const adminUser: User = {
     id: 'admin',
     name: 'Admin User',
+    email: 'admin@gmail.com',
     avatarUrl: 'https://picsum.photos/seed/Admin/40/40',
     karma: 999,
     civicScore: 9999
@@ -82,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     
     // For prototype, we'll just find a user by email. Password isn't checked.
-    const foundUser = allUsers.find((u: User) => u.name.toLowerCase().replace(/ /g, '.') + '@example.com' === email.toLowerCase());
+    const foundUser = allUsers.find((u: User) => u.email.toLowerCase() === email.toLowerCase());
 
     if (foundUser) {
       localStorage.setItem('civiclink-user', JSON.stringify(foundUser));
@@ -105,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    const existingUser = allUsers.find(u => u.name.toLowerCase().replace(/ /g, '.') + '@example.com' === email.toLowerCase());
+    const existingUser = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
     if (existingUser) {
         setLoading(false);
         throw new Error("An account with this email already exists.");
@@ -114,6 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const newUser: User = {
         id: `user-${Date.now()}`,
         name,
+        email,
         avatarUrl: `https://picsum.photos/seed/${name}/40/40`,
         karma: 0,
         civicScore: 0,

@@ -45,7 +45,7 @@ export function UserTable({ users }: UserTableProps) {
                         <span className="font-medium">{user.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell>{user.id === 'admin' ? 'admin@gmail.com' : `${user.name.toLowerCase().replace(/ /g, '.')}@example.com`}</TableCell>
+                  <TableCell>{user.email}</TableCell>
                   <TableCell>{user.karma}</TableCell>
                   <TableCell>{user.civicScore}</TableCell>
                 </TableRow>

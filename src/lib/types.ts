@@ -5,6 +5,7 @@ export type IssueCategory = "Pothole" | "Graffiti" | "Damaged Sign" | "Streetlig
 export type User = {
   id: string;
   name: string;
+  email: string;
   avatarUrl: string;
   karma: number;
   civicScore: number;

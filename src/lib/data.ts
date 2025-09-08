@@ -6,6 +6,7 @@ export const getInitialUsers = (): User[] => [
   {
     id: 'user-1',
     name: 'Jane Doe',
+    email: 'jane.doe@example.com',
     avatarUrl: 'https://picsum.photos/seed/Jane/40/40',
     karma: 0, // Will be calculated
     civicScore: 0, // Will be calculated
@@ -13,6 +14,7 @@ export const getInitialUsers = (): User[] => [
   {
     id: 'user-2',
     name: 'John Smith',
+    email: 'john.smith@example.com',
     avatarUrl: 'https://picsum.photos/seed/John/40/40',
     karma: 0,
     civicScore: 0,
@@ -20,6 +22,7 @@ export const getInitialUsers = (): User[] => [
     {
     id: 'user-3',
     name: 'Emily White',
+    email: 'emily.white@example.com',
     avatarUrl: 'https://picsum.photos/seed/Emily/40/40',
     karma: 0,
     civicScore: 0,
@@ -27,6 +30,7 @@ export const getInitialUsers = (): User[] => [
   {
     id: 'user-4',
     name: 'Michael Brown',
+    email: 'michael.brown@example.com',
     avatarUrl: 'https://picsum.photos/seed/Michael/40/40',
     karma: 0,
     civicScore: 0,
