@@ -28,29 +28,15 @@ import {
 } from "@/components/ui/select";
 import { MoreHorizontal } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserTable } from "./UserTable";
 
 interface AdminDashboardProps {
   allIssues: Issue[];
 }
 
-const USERS_STORAGE_KEY = 'civiclink-users';
-
 export function AdminDashboard({ allIssues }: AdminDashboardProps) {
   const [issues, setIssues] = useState<Issue[]>(allIssues);
-  const [users, setUsers] = useState<User[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>("All");
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
-
-  useEffect(() => {
-    // On the client, load users from localStorage
-    const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
-    if (storedUsers) {
-      setUsers(JSON.parse(storedUsers));
-    } else {
-      setUsers(getInitialUsers());
-    }
-  }, []);
 
   const statuses: IssueStatus[] = ["Open", "In Progress", "Resolved", "Rejected"];
 
@@ -161,8 +147,6 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
             )}
         </CardContent>
       </Card>
-
-      <UserTable users={users} />
     </div>
   );
 }
