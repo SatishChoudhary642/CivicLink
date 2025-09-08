@@ -32,15 +32,19 @@ const prompt = ai.definePrompt({
   name: 'predictResolutionStatusPrompt',
   input: {schema: PredictResolutionStatusInputSchema},
   output: {schema: PredictResolutionStatusOutputSchema},
-  prompt: `You are an AI assistant specializing in predicting the resolution status of civic issue reports.
+  prompt: `You are an AI assistant specializing in predicting the resolution status of civic issue reports in Pune, India.
   Based on the category, description, and location of the report, predict the resolution status and provide a confidence level.
 
   Category: {{{category}}}
   Description: {{{description}}}
   Location: {{{location}}}
 
+  Consider factors like the responsible municipal department (e.g., Road Dept, Water Supply, Solid Waste Management), the urgency of the issue, and typical resolution times for different types of complaints in a large Indian city.
+
   Respond with the predicted status and confidence level in JSON format.
   Possible resolution statuses include: "Open", "Under Review", "In Progress", "Resolved", "Rejected".
+  Possible issue categories include: "Garbage Dump / Overflowing Bins", "Garbage Vehicle Not Arrived", "Sweeping Not Done", "Illegal Dumping / Debris", "Dead Animal Removal", "Burning of Garbage", "Potholes / Damaged Road Surface", "Malfunctioning or Broken Streetlights", "Damaged Footpath or Paving Slabs", "Fallen Trees or Branches Obstructing Road", "Open Manhole or Drain Cover", "Sewerage Overflow", "Blocked Drains", "Stagnant Water on Roads", "Water Pipe Leakage", "Public Toilet Not Cleaned", "No Water Supply in Public Toilet", "No Electricity in Public Toilet", "Blocked Public Toilet", "Maintenance of Public Parks / Gardens", "Public Urination", "Illegal Banners or Hoardings", "Stray Animal Nuisance", "Other".
+
   The confidence level should be a number between 0 and 1.
   `,
 });
