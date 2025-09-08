@@ -28,7 +28,13 @@ export default function Header() {
             href="/"
             className="text-foreground/60 transition-colors hover:text-foreground/80"
           >
-            Dashboard
+            Feed
+          </Link>
+          <Link
+            href="/map"
+            className="text-foreground/60 transition-colors hover:text-foreground/80"
+          >
+            Map
           </Link>
           {user && (
             <>
@@ -91,7 +97,10 @@ export default function Header() {
                   <span className="font-headline font-bold">CivicLink</span>
                 </Link>
                 <Link href="/" className="hover:text-foreground">
-                  Dashboard
+                  Feed
+                </Link>
+                <Link href="/map" className="hover:text-foreground">
+                  Map
                 </Link>
                 {user && (
                   <>
