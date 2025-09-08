@@ -28,7 +28,7 @@ const CategorizeUploadedImageOutputSchema = z.object({
   category: z
     .string()
     .describe(
-      'The category of the image.  For example, pothole, graffiti, damaged sign, etc.'
+      'The category of the image. Must be one of the provided valid categories.'
     ),
   confidence: z
     .number()
@@ -46,13 +46,43 @@ export async function categorizeUploadedImage(
   return categorizeUploadedImageFlow(input);
 }
 
+const validCategories = [
+    "Garbage Dump / Overflowing Bins",
+    "Garbage Vehicle Not Arrived",
+    "Sweeping Not Done",
+    "Illegal Dumping / Debris",
+    "Dead Animal Removal",
+    "Burning of Garbage",
+    "Potholes / Damaged Road Surface",
+    "Malfunctioning or Broken Streetlights",
+    "Damaged Footpath or Paving Slabs",
+    "Fallen Trees or Branches Obstructing Road",
+    "Open Manhole or Drain Cover",
+    "Sewerage Overflow",
+    "Blocked Drains",
+    "Stagnant Water on Roads",
+    "Water Pipe Leakage",
+    "Public Toilet Not Cleaned",
+    "No Water Supply in Public Toilet",
+    "No Electricity in Public Toilet",
+    "Blocked Public Toilet",
+    "Maintenance of Public Parks / Gardens",
+    "Public Urination",
+    "Illegal Banners or Hoardings",
+    "Stray Animal Nuisance",
+    "Other",
+];
+
 const prompt = ai.definePrompt({
   name: 'categorizeUploadedImagePrompt',
   input: {schema: CategorizeUploadedImageInputSchema},
   output: {schema: CategorizeUploadedImageOutputSchema},
   prompt: `You are an AI that categorizes images of civic issues.
 
-  Analyze the image and determine the most appropriate category for it.
+  Analyze the image and determine the most appropriate category for it from the list of valid categories. You MUST choose one of the categories from the list provided below.
+
+  Valid Categories:
+  - ${validCategories.join('\n  - ')}
 
   The image is provided as a data URI.
 
