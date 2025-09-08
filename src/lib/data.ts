@@ -34,6 +34,48 @@ export const users: User[] = [
 
 export const issues: Issue[] = [
   {
+    id: '5',
+    title: 'Major Pothole near FC Road',
+    description: 'A large pothole on Ghole Road is causing traffic issues, especially for two-wheelers. Needs immediate attention.',
+    category: 'Pothole',
+    status: 'Open',
+    imageUrl: 'https://picsum.photos/seed/potholepune/600/400',
+    imageHint: 'pothole pune',
+    location: {
+      lat: 18.5204,
+      lng: 73.8567,
+      address: 'Ghole Road, Pune, Maharashtra',
+    },
+    votes: {
+      up: 12,
+      down: 0,
+    },
+    createdAt: '2024-05-22T09:00:00Z',
+    reporter: users[0],
+    comments: [],
+  },
+  {
+    id: '6',
+    title: 'Streetlight Not Working in Wagholi',
+    description: 'The main streetlight on Kesnand Road, Wagholi has been out for a week. It is very dark and unsafe at night.',
+    category: 'Streetlight Out',
+    status: 'In Progress',
+    imageUrl: 'https://picsum.photos/seed/wagholilight/600/400',
+    imageHint: 'streetlight dark',
+    location: {
+      lat: 18.5687,
+      lng: 73.9625,
+      address: 'Kesnand Road, Wagholi, Pune',
+    },
+    votes: {
+      up: 7,
+      down: 1,
+    },
+    createdAt: '2024-05-21T18:00:00Z',
+    reporter: users[1],
+    comments: [],
+  },
+  {
     id: '1',
     title: 'Large pothole on Main St',
     description: 'A very large and dangerous pothole has formed in the middle of Main Street near the intersection with Oak Ave. It has already caused a flat tire on my car.',
