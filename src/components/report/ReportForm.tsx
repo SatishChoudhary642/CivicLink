@@ -23,9 +23,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { issueCategories } from '@/lib/data';
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Camera, Loader2, MapPin } from 'lucide-react';
+import { Camera, Loader2, MapPin, Mic, MicOff } from 'lucide-react';
 import { getCategoryForImage, createIssue } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 
@@ -41,8 +41,11 @@ export function ReportForm() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isCategorizing, setIsCategorizing] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -52,6 +55,60 @@ export function ReportForm() {
       location: '',
     },
   });
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        const currentDescription = form.getValues('description');
+        form.setValue('description', currentDescription + finalTranscript + interimTranscript);
+      };
+      
+      recognition.onerror = (event) => {
+          console.error('Speech recognition error', event.error);
+          toast({ variant: 'destructive', title: 'Speech Error', description: `An error occurred: ${event.error}` });
+          setIsRecording(false);
+      }
+      
+      recognition.onend = () => {
+          if (isRecording) { // If it ends unexpectedly, stop our state
+            setIsRecording(false);
+          }
+      };
+      
+      recognitionRef.current = recognition;
+    } else {
+        toast({ variant: 'destructive', title: 'Not Supported', description: 'Speech recognition is not supported in your browser.' });
+    }
+    
+    return () => {
+        recognitionRef.current?.stop();
+    }
+  }, [form, toast, isRecording]);
+
+  const handleMicClick = () => {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+    } else {
+      recognitionRef.current?.start();
+      setIsRecording(true);
+    }
+  };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -157,7 +214,7 @@ export function ReportForm() {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Large pothole on Main St" {...field} />
+                <Input placeholder="e.g., Large pothole" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -170,13 +227,26 @@ export function ReportForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Tell us more about the issue, including its exact location and any potential hazards."
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
+               <div className="relative">
+                 <FormControl>
+                    <Textarea
+                      placeholder="Tell us more about the issue, or use the microphone to speak."
+                      className="resize-none pr-10"
+                      {...field}
+                    />
+                  </FormControl>
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={handleMicClick}
+                    disabled={!recognitionRef.current}
+                  >
+                    {isRecording ? <MicOff className="h-4 w-4 text-red-500" /> : <Mic className="h-4 w-4" />}
+                    <span className="sr-only">Record description</span>
+                  </Button>
+               </div>
               <FormMessage />
             </FormItem>
           )}
