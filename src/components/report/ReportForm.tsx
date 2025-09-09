@@ -333,6 +333,9 @@ export function ReportForm() {
         const { latitude, longitude } = position.coords;
         try {
           const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=jsonv2`);
+          if (!response.ok) {
+            throw new Error('Reverse geocoding failed');
+          }
           const data = await response.json();
           if (data && data.display_name) {
             form.setValue('location', data.display_name);

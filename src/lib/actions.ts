@@ -45,6 +45,24 @@ export async function createIssue(values: z.infer<typeof FormSchema>) {
     const currentUser = users.find(u => u.id === currentUserId)!;
 
     console.log("Creating issue with values:", values);
+    
+    let lat = 0;
+    let lng = 0;
+
+    try {
+        const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`);
+        const geoData = await geoResponse.json();
+        
+        if (geoData && geoData.length > 0) {
+            lat = parseFloat(geoData[0].lat);
+            lng = parseFloat(geoData[0].lon);
+        } else {
+            console.warn("Geocoding failed for address:", location);
+        }
+    } catch (error) {
+        console.error("Error during geocoding:", error);
+    }
+
 
     const newIssue: Issue = {
         id: `issue-${Date.now()}`,
@@ -55,8 +73,8 @@ export async function createIssue(values: z.infer<typeof FormSchema>) {
         imageUrl: photoDataUri || 'https://picsum.photos/600/400',
         imageHint: 'new issue',
         location: {
-            lat: 0, // In a real app, geocode the address
-            lng: 0,
+            lat,
+            lng,
             address: location,
         },
         votes: { up: 1, down: 0 },
