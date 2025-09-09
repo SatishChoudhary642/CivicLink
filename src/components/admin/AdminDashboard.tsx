@@ -119,6 +119,42 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
     }
   };
 
+  const ReportsList = ({ isSplitView }: { isSplitView: boolean }) => (
+    <ScrollArea className="h-[600px] rounded-md border">
+        <div className="p-2 space-y-2">
+            {filteredIssues.length > 0 ? filteredIssues.map(issue => (
+                <button 
+                    key={issue.id} 
+                    className={cn(
+                        "w-full text-left p-3 rounded-lg border transition-all",
+                        selectedIssue?.id === issue.id 
+                            ? "bg-primary/10 border-primary shadow-sm" 
+                            : "hover:bg-muted/50"
+                    )}
+                    onClick={() => setSelectedIssue(issue)}
+                >
+                    <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-semibold text-sm flex-1 pr-2">{issue.title}</h4>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                            <Badge variant={getStatusVariant(issue.status)} className="text-xs">{issue.status}</Badge>
+                            {issue.priority && <Badge className={cn("text-xs", getPriorityClasses(issue.priority))}>{issue.priority}</Badge>}
+                        </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{issue.category}</p>
+                    <p className="text-xs text-muted-foreground">{issue.location.address}</p>
+                    <div className="flex justify-between items-center mt-2">
+                      <p className="text-xs text-muted-foreground">ID: {issue.id}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(issue.createdAt).toLocaleDateString()}</p>
+                    </div>
+                </button>
+            )) : (
+                <div className="p-4 text-center text-muted-foreground">
+                    No reports found.
+                </div>
+            )}
+        </div>
+    </ScrollArea>
+  );
 
   return (
     <div className="space-y-8">
@@ -161,52 +197,11 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                 </div>
 
                 {/* Main Content */}
-                <div className={cn(
-                    "grid grid-cols-1 gap-6",
-                    selectedIssue && "md:grid-cols-3 lg:grid-cols-4"
-                )}>
-                    {/* Reports List */}
-                    <div className={cn(
-                        selectedIssue ? "md:col-span-1 lg:col-span-1" : "col-span-full"
-                    )}>
-                        <ScrollArea className="h-[600px] rounded-md border">
-                            <div className="p-2 space-y-2">
-                                {filteredIssues.length > 0 ? filteredIssues.map(issue => (
-                                    <button 
-                                        key={issue.id} 
-                                        className={cn(
-                                            "w-full text-left p-3 rounded-lg border transition-all",
-                                            selectedIssue?.id === issue.id 
-                                                ? "bg-primary/10 border-primary shadow-sm" 
-                                                : "hover:bg-muted/50"
-                                        )}
-                                        onClick={() => setSelectedIssue(issue)}
-                                    >
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h4 className="font-semibold text-sm flex-1 pr-2">{issue.title}</h4>
-                                            <div className="flex items-center gap-1.5 shrink-0">
-                                                <Badge variant={getStatusVariant(issue.status)} className="text-xs">{issue.status}</Badge>
-                                                {issue.priority && <Badge className={cn("text-xs", getPriorityClasses(issue.priority))}>{issue.priority}</Badge>}
-                                            </div>
-                                        </div>
-                                        <p className="text-xs text-muted-foreground">{issue.category}</p>
-                                        <p className="text-xs text-muted-foreground">{issue.location.address}</p>
-                                        <div className="flex justify-between items-center mt-2">
-                                          <p className="text-xs text-muted-foreground">ID: {issue.id}</p>
-                                          <p className="text-xs text-muted-foreground">{new Date(issue.createdAt).toLocaleDateString()}</p>
-                                        </div>
-                                    </button>
-                                )) : (
-                                    <div className="p-4 text-center text-muted-foreground">
-                                        No reports found.
-                                    </div>
-                                )}
-                            </div>
-                        </ScrollArea>
-                    </div>
-
-                    {/* Report Details */}
-                     {selectedIssue && (
+                {selectedIssue ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <div className="md:col-span-1 lg:col-span-1">
+                            <ReportsList isSplitView={true} />
+                        </div>
                         <div className="md:col-span-2 lg:col-span-3">
                            <ReportDetails 
                               issue={selectedIssue} 
@@ -216,8 +211,10 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                               onClose={() => setSelectedIssue(null)}
                             />
                         </div>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    <ReportsList isSplitView={false} />
+                )}
             </CardContent>
         </Card>
     </div>
