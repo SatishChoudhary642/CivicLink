@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Issue, IssueStatus, Priority } from "@/lib/types";
@@ -51,7 +52,7 @@ export function ReportDetails({ issue, onStatusChange, statuses, getPriorityClas
              <Button 
                 variant="ghost" 
                 size="icon" 
-                className="absolute top-2 right-2 h-7 w-7"
+                className="absolute top-2 right-2 h-7 w-7 md:hidden"
                 onClick={onClose}
               >
                 <X className="h-4 w-4" />
@@ -62,20 +63,31 @@ export function ReportDetails({ issue, onStatusChange, statuses, getPriorityClas
                     <CardTitle className="flex items-center gap-2 font-headline">
                         Report Details
                     </CardTitle>
-                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm">
-                                Change Status <ChevronDown className="ml-2 h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            {statuses.map(status => (
-                                <DropdownMenuItem key={status} onClick={() => onStatusChange(issue.id, status)}>
-                                    Mark as {status}
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                     <div className="flex items-center gap-2">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                    Change Status <ChevronDown className="ml-2 h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                {statuses.map(status => (
+                                    <DropdownMenuItem key={status} onClick={() => onStatusChange(issue.id, status)}>
+                                        Mark as {status}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 hidden md:inline-flex"
+                            onClick={onClose}
+                        >
+                            <X className="h-4 w-4" />
+                            <span className="sr-only">Close</span>
+                        </Button>
+                    </div>
                 </div>
             </CardHeader>
             <CardContent className="space-y-6">

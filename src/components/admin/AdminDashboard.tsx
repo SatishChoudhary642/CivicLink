@@ -163,9 +163,15 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                 </div>
 
                 {/* Main Content */}
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className={cn(
+                    "grid grid-cols-1 gap-6",
+                    selectedIssue && "md:grid-cols-3 lg:grid-cols-4"
+                )}>
                     {/* Reports List */}
-                    <div className="md:col-span-1 lg:col-span-1">
+                    <div className={cn(
+                        "md:col-span-3 lg:col-span-4",
+                        selectedIssue && "md:col-span-1 lg:col-span-1"
+                    )}>
                         <ScrollArea className="h-[600px] rounded-md border">
                             <div className="p-2 space-y-2">
                                 {filteredIssues.length > 0 ? filteredIssues.map(issue => (
@@ -203,15 +209,17 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                     </div>
 
                     {/* Report Details */}
-                    <div className="md:col-span-2 lg:col-span-3">
-                       <ReportDetails 
-                          issue={selectedIssue} 
-                          onStatusChange={handleStatusChange} 
-                          statuses={statuses}
-                          getPriorityClasses={getPriorityClasses}
-                          onClose={() => setSelectedIssue(null)}
-                        />
-                    </div>
+                     {selectedIssue && (
+                        <div className="md:col-span-2 lg:col-span-3">
+                           <ReportDetails 
+                              issue={selectedIssue} 
+                              onStatusChange={handleStatusChange} 
+                              statuses={statuses}
+                              getPriorityClasses={getPriorityClasses}
+                              onClose={() => setSelectedIssue(null)}
+                            />
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>
