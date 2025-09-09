@@ -48,6 +48,8 @@ export type Issue = {
   description: string;
   category: IssueCategory;
   status: IssueStatus;
+  priority?: 'High' | 'Medium' | 'Low';
+  priorityJustification?: string;
   imageUrl: string;
   imageHint: string;
   location: {
