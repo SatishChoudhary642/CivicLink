@@ -9,6 +9,21 @@ import { IssueCard } from '@/components/feed/IssueCard';
 
 export const dynamic = 'force-dynamic';
 
+const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'Open':
+        return 'secondary';
+      case 'In Progress':
+        return 'default';
+      case 'Resolved':
+        return 'outline';
+      case 'Rejected':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
+};
+
 export default function Home() {
   return (
     <div className="bg-muted/40 min-h-screen">
@@ -22,7 +37,7 @@ export default function Home() {
 
         <div className="space-y-4">
           {issues.map((issue) => (
-            <IssueCard key={issue.id} issue={issue} />
+            <IssueCard key={issue.id} issue={issue} getStatusVariant={getStatusVariant} />
           ))}
         </div>
       </div>
