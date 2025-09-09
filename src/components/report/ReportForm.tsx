@@ -582,7 +582,7 @@ export function ReportForm() {
         />
         
         {/* Submit Button */}
-        <Button type="submit" className="w-full" disabled={isPending || isCategorizing || !form.formState.isValid}>
+        <Button type="submit" className="w-full" disabled={isPending || isCategorizing}>
           {(isPending || isCategorizing) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {t.submitReport}
         </Button>

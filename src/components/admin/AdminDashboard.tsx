@@ -26,7 +26,7 @@ interface AdminDashboardProps {
 }
 
 export function AdminDashboard({ allIssues }: AdminDashboardProps) {
-  const [issues, setIssues] = useState<Issue[]>(allIssues);
+  const [issuesWithPriority, setIssuesWithPriority] = useState<Issue[]>(allIssues);
   const [statusFilter, setStatusFilter] = useState<string>("All");
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
   const [priorityFilter, setPriorityFilter] = useState<string>("All");
@@ -34,13 +34,10 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
 
   useEffect(() => {
-    setIssues(allIssues);
-  }, [allIssues]);
-
-
-  useEffect(() => {
+    setIssuesWithPriority(allIssues);
+    
     const assessPriorities = async () => {
-      const issuesToAssess = issues.filter(issue => !issue.priority);
+      const issuesToAssess = allIssues.filter(issue => !issue.priority);
       if (issuesToAssess.length === 0) return;
 
       const priorityPromises = issuesToAssess.map(issue => 
@@ -56,7 +53,7 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
 
       const results = await Promise.all(priorityPromises);
 
-      const newIssues = issues.map(issue => {
+      const newIssues = allIssues.map(issue => {
         const foundResult = results.find(res => res.issueId === issue.id);
         if (foundResult) {
           return {
@@ -67,31 +64,30 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
         }
         return issue;
       });
-      setIssues(newIssues);
+      setIssuesWithPriority(newIssues);
     };
 
     assessPriorities();
-  }, [issues]);
+  }, [allIssues]);
   
   const statuses: IssueStatus[] = ["Open", "In Progress", "Resolved", "Rejected"];
   const priorities: Priority[] = ["High", "Medium", "Low"];
 
   const filteredIssues = useMemo(() => {
-    return issues.filter((issue) => {
+    return issuesWithPriority.filter((issue) => {
       const statusMatch = statusFilter === "All" || issue.status === statusFilter;
       const categoryMatch = categoryFilter === "All" || issue.category === categoryFilter;
       const priorityMatch = priorityFilter === "All" || issue.priority === priorityFilter;
       const searchMatch = !searchQuery || issue.title.toLowerCase().includes(searchQuery.toLowerCase());
       return statusMatch && categoryMatch && priorityMatch && searchMatch;
     });
-  }, [issues, statusFilter, categoryFilter, priorityFilter, searchQuery]);
+  }, [issuesWithPriority, statusFilter, categoryFilter, priorityFilter, searchQuery]);
   
   useEffect(() => {
     if (selectedIssue && !filteredIssues.some(issue => issue.id === selectedIssue.id)) {
         setSelectedIssue(null);
     }
   }, [selectedIssue, filteredIssues]);
-
 
   const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
@@ -113,10 +109,10 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
   }
   
   const handleStatusChange = (issueId: string, newStatus: IssueStatus) => {
-    const updatedIssues = issues.map((issue) =>
+    const updatedIssues = issuesWithPriority.map((issue) =>
       issue.id === issueId ? { ...issue, status: newStatus } : issue
     );
-    setIssues(updatedIssues);
+    setIssuesWithPriority(updatedIssues);
     
     if (selectedIssue && selectedIssue.id === issueId) {
         setSelectedIssue(prev => prev ? { ...prev, status: newStatus } : null);

@@ -28,7 +28,7 @@ const FormSchema = z.object({
     location: z.string().min(3),
     latitude: z.number().optional(),
     longitude: z.number().optional(),
-    photoDataUri: z.string().optional(),
+    photoDataUri: z.string().min(1, { message: 'Please upload a photo.'}),
 });
 
 // In a real app, you would get the current user from your authentication system.
