@@ -1,4 +1,7 @@
+
 export type IssueStatus = "Open" | "In Progress" | "Resolved" | "Rejected";
+
+export type Priority = "High" | "Medium" | "Low";
 
 export type IssueCategory = 
   | "Garbage Dump / Overflowing Bins"
@@ -48,7 +51,7 @@ export type Issue = {
   description: string;
   category: IssueCategory;
   status: IssueStatus;
-  priority?: 'High' | 'Medium' | 'Low';
+  priority?: Priority;
   priorityJustification?: string;
   imageUrl: string;
   imageHint: string;

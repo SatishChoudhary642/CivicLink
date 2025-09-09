@@ -1,8 +1,9 @@
+
 'use server';
 
 import { z } from 'zod';
 import { categorizeUploadedImage } from '@/ai/flows/categorize-uploaded-image';
-import { getInitialUsers } from '@/context/IssueContext';
+import { getInitialUsers } from '@/lib/data';
 import type { Issue, IssueCategory } from './types';
 
 
@@ -100,3 +101,4 @@ export async function createIssue(values: z.infer<typeof FormSchema>): Promise<I
     
     return newIssue;
 }
+
