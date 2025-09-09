@@ -1,3 +1,4 @@
+
 import type { Issue, IssueCategory, User } from './types';
 
 // Use a function to return a fresh copy of the initial users,
@@ -143,6 +144,26 @@ export const issues: Issue[] = [
     comments: [],
   },
   {
+    id: 'pune-rejected-1',
+    title: 'My neighbor\'s dog is too cute',
+    description: 'The dog in my neighborhood is distracting me with its cuteness. This is a civic emergency.',
+    category: 'Other',
+    status: 'Rejected',
+    priority: 'Low',
+    priorityJustification: 'This is not a valid civic issue.',
+    imageUrl: 'https://picsum.photos/seed/cutedog/600/400',
+    imageHint: 'cute dog',
+    location: {
+      lat: 18.531,
+      lng: 73.888,
+      address: 'Kalyani Nagar, Pune',
+    },
+    votes: { up: 2, down: 12 },
+    createdAt: '2024-05-20T10:00:00Z',
+    reporter: users.find(u => u.id === 'user-4')!,
+    comments: [],
+  },
+  {
     id: 'pune-3',
     title: 'Graffiti at Shaniwar Wada Wall',
     description: 'Someone has spray-painted inappropriate graffiti on the historic walls of Shaniwar Wada. This needs to be cleaned to preserve our heritage.',
@@ -220,6 +241,26 @@ export const issues: Issue[] = [
     votes: { up: 72, down: 1 },
     createdAt: '2024-05-31T11:00:00Z',
     reporter: users.find(u => u.id === 'user-2')!,
+    comments: [],
+  },
+  {
+    id: 'pune-rejected-2',
+    title: 'Pigeons are judging me',
+    description: 'The pigeons at the bus stop stare at me every day. It\'s a coordinated effort and it needs to stop. This is harassment.',
+    category: 'Stray Animal Nuisance',
+    status: 'Rejected',
+    priority: 'Low',
+    priorityJustification: 'The behavior of pigeons is not a manageable civic issue.',
+    imageUrl: 'https://picsum.photos/seed/pigeons/600/400',
+    imageHint: 'pigeons staring',
+    location: {
+      lat: 18.520,
+      lng: 73.856,
+      address: 'Shivaji Nagar Bus Stand, Pune',
+    },
+    votes: { up: 1, down: 21 },
+    createdAt: '2024-05-19T11:00:00Z',
+    reporter: users.find(u => u.id === 'user-3')!,
     comments: [],
   },
   {
