@@ -34,6 +34,8 @@ const FormSchema = z.object({
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
   category: z.string({ required_error: "Please select a category." }),
   location: z.string().min(3, { message: "Please provide a location." }),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   photoDataUri: z.string().optional(),
 });
 
@@ -331,6 +333,9 @@ export function ReportForm() {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
+        form.setValue('latitude', latitude);
+        form.setValue('longitude', longitude);
+
         try {
           const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=jsonv2`);
           if (!response.ok) {

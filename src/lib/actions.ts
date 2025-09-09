@@ -27,6 +27,8 @@ const FormSchema = z.object({
     description: z.string().min(10),
     category: z.string(),
     location: z.string().min(3),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
     photoDataUri: z.string().optional(),
 });
 
@@ -41,7 +43,7 @@ export async function createIssue(values: z.infer<typeof FormSchema>) {
         throw new Error('Invalid form data.');
     }
     
-    const { title, description, category, location, photoDataUri } = validatedFields.data;
+    const { title, description, category, location, photoDataUri, latitude, longitude } = validatedFields.data;
     const currentUser = users.find(u => u.id === currentUserId)!;
 
     console.log("Creating issue with values:", values);
@@ -49,18 +51,24 @@ export async function createIssue(values: z.infer<typeof FormSchema>) {
     let lat = 0;
     let lng = 0;
 
-    try {
-        const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`);
-        const geoData = await geoResponse.json();
-        
-        if (geoData && geoData.length > 0) {
-            lat = parseFloat(geoData[0].lat);
-            lng = parseFloat(geoData[0].lon);
-        } else {
-            console.warn("Geocoding failed for address:", location);
+    // Use provided coordinates if they exist, otherwise geocode the address
+    if (latitude && longitude) {
+        lat = latitude;
+        lng = longitude;
+    } else {
+        try {
+            const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`);
+            const geoData = await geoResponse.json();
+            
+            if (geoResponse.ok && geoData && geoData.length > 0) {
+                lat = parseFloat(geoData[0].lat);
+                lng = parseFloat(geoData[0].lon);
+            } else {
+                console.warn("Geocoding failed for address:", location);
+            }
+        } catch (error) {
+            console.error("Error during geocoding:", error);
         }
-    } catch (error) {
-        console.error("Error during geocoding:", error);
     }
 
 
