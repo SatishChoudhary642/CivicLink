@@ -2,7 +2,6 @@
 
 import { z } from 'zod';
 import { categorizeUploadedImage } from '@/ai/flows/categorize-uploaded-image';
-import { predictResolutionStatus } from '@/ai/flows/predict-resolution-status';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { issues, getInitialUsers } from './data';
@@ -45,8 +44,6 @@ export async function createIssue(values: z.infer<typeof FormSchema>) {
     
     const { title, description, category, location, photoDataUri, latitude, longitude } = validatedFields.data;
     const currentUser = users.find(u => u.id === currentUserId)!;
-
-    console.log("Creating issue with values:", values);
     
     let lat = 0;
     let lng = 0;
@@ -91,25 +88,11 @@ export async function createIssue(values: z.infer<typeof FormSchema>) {
         comments: [],
     };
     
-    try {
-        const prediction = await predictResolutionStatus({
-            category: values.category,
-            description: values.description,
-            location: values.location,
-        });
-        console.log("AI Prediction on new issue:", prediction);
-        // Here you would use the prediction, e.g., save it with the issue and potentially override the default 'Open' status
-        if (prediction.predictedStatus) {
-            // This is just an example, you might have more complex logic
-            // newIssue.status = prediction.predictedStatus as Issue['status'];
-        }
-    } catch(error) {
-        console.error("AI prediction failed:", error);
-    }
-
     // In a real app, you would save to a database here.
+    // Prepending the new issue to the in-memory array.
     issues.unshift(newIssue);
     
+    // Revalidate paths to ensure fresh data is fetched on navigation.
     revalidatePath('/');
-    redirect('/');
+    revalidatePath('/admin');
 }

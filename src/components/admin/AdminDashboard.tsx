@@ -33,6 +33,12 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
 
+  // When allIssues prop changes (e.g. after revalidation), update our local state
+  useEffect(() => {
+    setIssues(allIssues);
+  }, [allIssues]);
+
+
   useEffect(() => {
     const assessPriorities = async () => {
       const issuesToAssess = issues.filter(issue => !issue.priority);
@@ -67,7 +73,7 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
     };
 
     assessPriorities();
-  }, []); // Only runs on mount
+  }, [issues]);
   
   const statuses: IssueStatus[] = ["Open", "In Progress", "Resolved", "Rejected"];
   const priorities: Priority[] = ["High", "Medium", "Low"];
@@ -197,11 +203,11 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                 </div>
 
                 {/* Main Content */}
-                {selectedIssue ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        <div className="md:col-span-1 lg:col-span-1">
-                            <ReportsList isSplitView={true} />
-                        </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div className={cn(selectedIssue ? "md:col-span-1 lg:col-span-1" : "col-span-full")}>
+                        <ReportsList isSplitView={!!selectedIssue} />
+                    </div>
+                    {selectedIssue && (
                         <div className="md:col-span-2 lg:col-span-3">
                            <ReportDetails 
                               issue={selectedIssue} 
@@ -211,10 +217,8 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                               onClose={() => setSelectedIssue(null)}
                             />
                         </div>
-                    </div>
-                ) : (
-                    <ReportsList isSplitView={false} />
-                )}
+                    )}
+                </div>
             </CardContent>
         </Card>
     </div>

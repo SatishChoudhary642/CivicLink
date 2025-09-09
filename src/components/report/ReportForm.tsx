@@ -28,6 +28,7 @@ import Image from 'next/image';
 import { Camera, Loader2, MapPin, Mic, MicOff, Volume2, Languages } from 'lucide-react';
 import { getCategoryForImage, createIssue } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 const FormSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
@@ -36,7 +37,7 @@ const FormSchema = z.object({
   location: z.string().min(3, { message: "Please provide a location." }),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  photoDataUri: z.string().optional(),
+  photoDataUri: z.string().min(1, { message: 'Please upload a photo.'}),
 });
 
 // Type declarations for Web Speech API
@@ -175,6 +176,7 @@ export function ReportForm() {
   const [isLocating, setIsLocating] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
+  const router = useRouter();
   
   // Speech recognition states
   const [isListening, setIsListening] = useState(false);
@@ -191,6 +193,7 @@ export function ReportForm() {
       title: '',
       description: '',
       location: '',
+      photoDataUri: '',
     },
   });
 
@@ -295,14 +298,14 @@ export function ReportForm() {
       reader.onloadend = async () => {
         const dataUri = reader.result as string;
         setImagePreview(dataUri);
-        form.setValue('photoDataUri', dataUri);
+        form.setValue('photoDataUri', dataUri, { shouldValidate: true });
         setIsCategorizing(true);
         try {
           const result = await getCategoryForImage(dataUri);
           if (result.category) {
             const matchingCategory = issueCategories.find(cat => cat.toLowerCase().includes(result.category.toLowerCase()));
             if (matchingCategory) {
-              form.setValue('category', matchingCategory);
+              form.setValue('category', matchingCategory, { shouldValidate: true });
               toast({ 
                 title: t.imageCategorized, 
                 description: `${t.weThink} "${matchingCategory}".` 
@@ -343,7 +346,7 @@ export function ReportForm() {
           }
           const data = await response.json();
           if (data && data.display_name) {
-            form.setValue('location', data.display_name);
+            form.setValue('location', data.display_name, { shouldValidate: true });
             toast({ title: t.locationFound, description: t.locationFoundDesc });
             speakInstructions(language === 'hi' ? "आपका स्थान मिल गया है।" : "Your location has been found.");
           } else {
@@ -352,7 +355,7 @@ export function ReportForm() {
         } catch (error) {
             console.error("Reverse geocoding error:", error);
             const locString = `Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`;
-            form.setValue('location', locString);
+            form.setValue('location', locString, { shouldValidate: true });
             toast({ variant: "destructive", title: t.locationError, description: "Could not fetch address. Using coordinates instead." });
         } finally {
             setIsLocating(false);
@@ -369,12 +372,13 @@ export function ReportForm() {
   function onSubmit(data: z.infer<typeof FormSchema>) {
     startTransition(async () => {
       try {
-        await createIssue(data)
+        await createIssue(data);
         toast({ title: t.reportSubmitted, description: t.thankYou });
         speakInstructions(language === 'hi' 
           ? "आपकी रिपोर्ट सफलतापूर्वक जमा कर दी गई है। धन्यवाद।"
           : "Your report has been submitted successfully. Thank you for your contribution."
         );
+        router.push('/');
       } catch (err) {
         toast({ variant: "destructive", title: t.submissionError, description: t.somethingWrong });
       }
@@ -420,7 +424,7 @@ export function ReportForm() {
         <FormField
           control={form.control}
           name="photoDataUri"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>{t.issuePhoto}</FormLabel>
               <FormControl>
@@ -537,7 +541,7 @@ export function ReportForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t.category}</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select onValueChange={(value) => field.onChange(value)} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder={t.categoryPlaceholder} />
@@ -578,7 +582,7 @@ export function ReportForm() {
         />
         
         {/* Submit Button */}
-        <Button type="submit" className="w-full" disabled={isPending || isCategorizing || !form.formState.isValid || !imagePreview}>
+        <Button type="submit" className="w-full" disabled={isPending || isCategorizing || !form.formState.isValid}>
           {(isPending || isCategorizing) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {t.submitReport}
         </Button>
