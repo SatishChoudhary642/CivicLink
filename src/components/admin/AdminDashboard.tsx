@@ -33,7 +33,6 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
 
-  // When allIssues prop changes (e.g. after revalidation), update our local state
   useEffect(() => {
     setIssues(allIssues);
   }, [allIssues]);
@@ -57,19 +56,18 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
 
       const results = await Promise.all(priorityPromises);
 
-      setIssues(prevIssues => 
-        prevIssues.map(issue => {
-          const foundResult = results.find(res => res.issueId === issue.id);
-          if (foundResult) {
-            return {
-              ...issue,
-              priority: foundResult.priority,
-              priorityJustification: foundResult.justification
-            }
+      const newIssues = issues.map(issue => {
+        const foundResult = results.find(res => res.issueId === issue.id);
+        if (foundResult) {
+          return {
+            ...issue,
+            priority: foundResult.priority,
+            priorityJustification: foundResult.justification
           }
-          return issue;
-        })
-      );
+        }
+        return issue;
+      });
+      setIssues(newIssues);
     };
 
     assessPriorities();
@@ -125,7 +123,7 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
     }
   };
 
-  const ReportsList = ({ isSplitView }: { isSplitView: boolean }) => (
+  const ReportsList = () => (
     <ScrollArea className="h-[600px] rounded-md border">
         <div className="p-2 space-y-2">
             {filteredIssues.length > 0 ? filteredIssues.map(issue => (
@@ -149,7 +147,7 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                     <p className="text-xs text-muted-foreground">{issue.category}</p>
                     <p className="text-xs text-muted-foreground">{issue.location.address}</p>
                     <div className="flex justify-between items-center mt-2">
-                      <p className="text-xs text-muted-foreground">ID: {issue.id}</p>
+                      <p className="text-xs text-muted-foreground">Votes: {issue.votes.up - issue.votes.down}</p>
                       <p className="text-xs text-muted-foreground">{new Date(issue.createdAt).toLocaleDateString()}</p>
                     </div>
                 </button>
@@ -164,7 +162,7 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
 
   return (
     <div className="space-y-8">
-        <DashboardStats issues={issues} />
+        <DashboardStats issues={allIssues} />
         
         <Card>
             <CardContent className="p-4">
@@ -205,7 +203,7 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                 {/* Main Content */}
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     <div className={cn(selectedIssue ? "md:col-span-1 lg:col-span-1" : "col-span-full")}>
-                        <ReportsList isSplitView={!!selectedIssue} />
+                        <ReportsList />
                     </div>
                     {selectedIssue && (
                         <div className="md:col-span-2 lg:col-span-3">
