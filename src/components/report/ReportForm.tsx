@@ -384,10 +384,11 @@ export function ReportForm() {
           );
           router.push('/');
         } else {
-            throw new Error("Failed to create issue.");
+            throw new Error("Server action failed to return an issue.");
         }
       } catch (err) {
-        toast({ variant: "destructive", title: t.submissionError, description: t.somethingWrong });
+        console.error("Submission failed:", err);
+        toast({ variant: "destructive", title: t.submissionError, description: (err as Error).message || t.somethingWrong });
       }
     });
   }
@@ -596,4 +597,4 @@ export function ReportForm() {
       </form>
     </Form>
   );
-} 
+}

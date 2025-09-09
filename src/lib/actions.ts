@@ -34,16 +34,20 @@ const currentUserId = "user-1";
 
 export async function createIssue(values: z.infer<typeof FormSchema>): Promise<Issue | null> {
     const validatedFields = FormSchema.safeParse(values);
+    
+    // In a real app, you'd fetch this from a DB or session
     const users = getInitialUsers();
 
     if (!validatedFields.success) {
-        console.error("Invalid form data:", validatedFields.error);
+        console.error("Invalid form data:", validatedFields.error.flatten().fieldErrors);
+        // Returning null or throwing an error are both valid options.
+        // Returning null allows the client to display a generic error.
         return null;
     }
     
     const { title, description, category, location, photoDataUri, latitude, longitude } = validatedFields.data;
     
-    // In a real app, the user would come from the session
+    // This would typically come from an authentication context
     const currentUser = users.find(u => u.id === currentUserId);
     if (!currentUser) {
         console.error("Could not find current user");
@@ -73,13 +77,15 @@ export async function createIssue(values: z.infer<typeof FormSchema>): Promise<I
         }
     }
 
+    // The server action's responsibility is just to create the new issue object.
+    // The client will handle adding it to its state.
     const newIssue: Issue = {
         id: `issue-${Date.now()}`,
         title,
         description,
         category: category as IssueCategory,
         status: 'Open',
-        imageUrl: photoDataUri || 'https://picsum.photos/600/400',
+        imageUrl: photoDataUri, // The data URI is used directly
         imageHint: 'new issue',
         location: {
             lat,
@@ -91,10 +97,6 @@ export async function createIssue(values: z.infer<typeof FormSchema>): Promise<I
         reporter: currentUser,
         comments: [],
     };
-    
-    // We are now managing state on the client, so we don't save here.
-    // We just return the created issue.
-    // The `revalidatePath` calls are also no longer needed as context handles re-renders.
     
     return newIssue;
 }
