@@ -37,43 +37,54 @@ export default function Home() {
   const handleVote = (issueId: string, voteType: 'up' | 'down') => {
     const currentVote = userVotes[issueId];
     let newVoteStatus: VoteStatus = voteType;
-    let newIssues = [...issues];
-    const issueIndex = newIssues.findIndex((issue) => issue.id === issueId);
-    if (issueIndex === -1) return;
-
-    const issue = newIssues[issueIndex];
-    const voteCount = { ...issue.votes };
-
-    // If current vote is same as new vote, undo it.
-    if (currentVote === voteType) {
-      newVoteStatus = null;
-      if (voteType === 'up') {
-        voteCount.up--;
+    
+    setIssues(prevIssues => {
+      const newIssues = [...prevIssues];
+      const issueIndex = newIssues.findIndex((issue) => issue.id === issueId);
+      if (issueIndex === -1) return prevIssues;
+  
+      const issue = { ...newIssues[issueIndex] };
+      const voteCount = { ...issue.votes };
+  
+      // If current vote is same as new vote, undo it.
+      if (currentVote === voteType) {
+        newVoteStatus = null;
+        if (voteType === 'up') {
+          voteCount.up--;
+        } else {
+          voteCount.down--;
+        }
       } else {
-        voteCount.down--;
+        // If there was a previous vote, undo its effect
+        if (currentVote === 'up') {
+          voteCount.up--;
+        } else if (currentVote === 'down') {
+          voteCount.down--;
+        }
+        
+        // Apply the new vote
+        if (voteType === 'up') {
+          voteCount.up++;
+        } else {
+          voteCount.down++;
+        }
       }
-    } else {
-      // If there was a previous vote, undo its effect
-      if (currentVote === 'up') {
-        voteCount.up--;
-      } else if (currentVote === 'down') {
-        voteCount.down--;
+  
+      issue.votes = voteCount;
+
+      // Check if the issue should be rejected
+      if (issue.votes.up - issue.votes.down <= -10) {
+        issue.status = 'Rejected';
       }
       
-      // Apply the new vote
-      if (voteType === 'up') {
-        voteCount.up++;
-      } else {
-        voteCount.down++;
-      }
-    }
+      newIssues[issueIndex] = issue;
+      
+      setUserVotes({
+        ...userVotes,
+        [issueId]: newVoteStatus,
+      });
 
-    newIssues[issueIndex] = { ...issue, votes: voteCount };
-    setIssues(newIssues);
-
-    setUserVotes({
-      ...userVotes,
-      [issueId]: newVoteStatus,
+      return newIssues;
     });
   };
 
@@ -96,7 +107,7 @@ export default function Home() {
                   size="sm"
                   className="h-8 w-8 p-1 text-muted-foreground hover:text-green-600"
                   onClick={() => handleVote(issue.id, 'up')}
-                  disabled={!user}
+                  disabled={!user || issue.status === 'Rejected'}
                 >
                   <ArrowBigUp className={`h-5 w-5 ${userVotes[issue.id] === 'up' ? 'fill-green-600 text-green-600' : ''}`} />
                 </Button>
@@ -106,7 +117,7 @@ export default function Home() {
                   size="sm"
                   className="h-8 w-8 p-1 text-muted-foreground hover:text-red-600"
                   onClick={() => handleVote(issue.id, 'down')}
-                  disabled={!user}
+                  disabled={!user || issue.status === 'Rejected'}
                 >
                   <ArrowBigDown className={`h-5 w-5 ${userVotes[issue.id] === 'down' ? 'fill-red-600 text-red-600' : ''}`} />
                 </Button>
