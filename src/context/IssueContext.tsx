@@ -3,6 +3,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import type { Issue, IssueCategory, User } from '@/lib/types';
+import { getInitialUsers } from '@/lib/users';
 
 
 export const issueCategories: IssueCategory[] = [
@@ -30,42 +31,6 @@ export const issueCategories: IssueCategory[] = [
     "Illegal Banners or Hoardings",
     "Stray Animal Nuisance",
     "Other",
-];
-
-// This can remain as a static list as users aren't dynamically added in this prototype
-export const getInitialUsers = (): User[] => [
-  {
-    id: 'user-1',
-    name: 'Aarav Sharma',
-    email: 'aarav.sharma@example.com',
-    avatarUrl: 'https://picsum.photos/seed/Aarav/40/40',
-    karma: 0,
-    civicScore: 0,
-  },
-  {
-    id: 'user-2',
-    name: 'Priya Patel',
-    email: 'priya.patel@example.com',
-    avatarUrl: 'https://picsum.photos/seed/Priya/40/40',
-    karma: 0,
-    civicScore: 0,
-  },
-    {
-    id: 'user-3',
-    name: 'Rohan Mehta',
-    email: 'rohan.mehta@example.com',
-    avatarUrl: 'https://picsum.photos/seed/Rohan/40/40',
-    karma: 0,
-    civicScore: 0,
-  },
-  {
-    id: 'user-4',
-    name: 'Saanvi Singh',
-    email: 'saanvi.singh@example.com',
-    avatarUrl: 'https://picsum.photos/seed/Saanvi/40/40',
-    karma: 0,
-    civicScore: 0,
-  }
 ];
 
 // Context type

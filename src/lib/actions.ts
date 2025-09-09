@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { categorizeUploadedImage } from '@/ai/flows/categorize-uploaded-image';
 import { getIssues, saveIssues } from '@/lib/data';
-import { getInitialUsers } from '@/context/IssueContext';
+import { getInitialUsers } from '@/lib/users';
 import type { Issue, IssueCategory } from './types';
 
 

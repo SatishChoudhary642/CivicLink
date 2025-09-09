@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User } from '@/lib/types';
-import { getInitialUsers } from '@/context/IssueContext';
+import { getInitialUsers } from '@/lib/users';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface AuthContextType {
