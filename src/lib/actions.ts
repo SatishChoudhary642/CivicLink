@@ -2,8 +2,10 @@
 'use server';
 
 import { z } from 'zod';
+import { revalidatePath } from 'next/cache';
 import { categorizeUploadedImage } from '@/ai/flows/categorize-uploaded-image';
-import { getInitialUsers } from '@/lib/data';
+import { getIssues, saveIssues } from '@/lib/data';
+import { getInitialUsers } from '@/context/IssueContext';
 import type { Issue, IssueCategory } from './types';
 
 
@@ -33,32 +35,27 @@ const FormSchema = z.object({
 // In a real app, you would get the current user from your authentication system.
 const currentUserId = "user-1";
 
-export async function createIssue(values: z.infer<typeof FormSchema>): Promise<Issue | null> {
+export async function createIssue(values: z.infer<typeof FormSchema>): Promise<{ success: boolean; error?: string }> {
     const validatedFields = FormSchema.safeParse(values);
     
-    // In a real app, you'd fetch this from a DB or session
-    const users = getInitialUsers();
-
     if (!validatedFields.success) {
         console.error("Invalid form data:", validatedFields.error.flatten().fieldErrors);
-        // Returning null or throwing an error are both valid options.
-        // Returning null allows the client to display a generic error.
-        return null;
+        return { success: false, error: "Invalid form data." };
     }
     
     const { title, description, category, location, photoDataUri, latitude, longitude } = validatedFields.data;
     
-    // This would typically come from an authentication context
+    const users = getInitialUsers();
     const currentUser = users.find(u => u.id === currentUserId);
     if (!currentUser) {
-        console.error("Could not find current user");
-        return null;
+        const errorMsg = "Could not find current user";
+        console.error(errorMsg);
+        return { success: false, error: errorMsg };
     }
     
     let lat = 0;
     let lng = 0;
 
-    // Use provided coordinates if they exist, otherwise geocode the address
     if (latitude && longitude) {
         lat = latitude;
         lng = longitude;
@@ -78,15 +75,13 @@ export async function createIssue(values: z.infer<typeof FormSchema>): Promise<I
         }
     }
 
-    // The server action's responsibility is just to create the new issue object.
-    // The client will handle adding it to its state.
     const newIssue: Issue = {
         id: `issue-${Date.now()}`,
         title,
         description,
         category: category as IssueCategory,
         status: 'Open',
-        imageUrl: photoDataUri, // The data URI is used directly
+        imageUrl: photoDataUri,
         imageHint: 'new issue',
         location: {
             lat,
@@ -98,7 +93,20 @@ export async function createIssue(values: z.infer<typeof FormSchema>): Promise<I
         reporter: currentUser,
         comments: [],
     };
-    
-    return newIssue;
-}
 
+    try {
+      const issues = await getIssues();
+      const updatedIssues = [newIssue, ...issues];
+      await saveIssues(updatedIssues);
+      
+      revalidatePath('/');
+      revalidatePath('/admin');
+      revalidatePath('/map');
+
+      return { success: true };
+    } catch(error) {
+        const errorMsg = "Failed to save the new issue.";
+        console.error(errorMsg, error);
+        return { success: false, error: errorMsg };
+    }
+}

@@ -1,10 +1,10 @@
-'use client';
+import { getIssues } from '@/lib/data';
+import { IssueFeed } from '@/components/feed/IssueFeed';
 
-import { IssueCard } from '@/components/feed/IssueCard';
-import { useIssues } from '@/context/IssueContext';
-
-export default function Home() {
-  const { issues } = useIssues();
+// This is now a Server Component
+export default async function Home() {
+  // Fetch initial issues on the server
+  const initialIssues = await getIssues();
 
   return (
     <div className="bg-muted/40 min-h-screen">
@@ -15,12 +15,8 @@ export default function Home() {
             View, vote, and discuss civic issues in your community.
           </p>
         </header>
-
-        <div className="space-y-4">
-          {issues.map((issue) => (
-            <IssueCard key={issue.id} issue={issue} />
-          ))}
-        </div>
+        {/* Pass server-fetched data to the new Client Component */}
+        <IssueFeed initialIssues={initialIssues} />
       </div>
     </div>
   );

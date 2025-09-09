@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,7 +30,6 @@ import { Camera, Loader2, MapPin, Mic, MicOff, Volume2, Languages } from 'lucide
 import { getCategoryForImage, createIssue } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { useIssues } from '@/context/IssueContext';
 
 const FormSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
@@ -178,7 +178,6 @@ export function ReportForm() {
   const [isPending, startTransition] = useTransition();
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
   const router = useRouter();
-  const { addIssue } = useIssues();
   
   // Speech recognition states
   const [isListening, setIsListening] = useState(false);
@@ -373,22 +372,17 @@ export function ReportForm() {
   
   function onSubmit(data: z.infer<typeof FormSchema>) {
     startTransition(async () => {
-      try {
-        const newIssue = await createIssue(data);
-        if (newIssue) {
-          addIssue(newIssue);
-          toast({ title: t.reportSubmitted, description: t.thankYou });
-          speakInstructions(language === 'hi' 
-            ? "आपकी रिपोर्ट सफलतापूर्वक जमा कर दी गई है। धन्यवाद।"
-            : "Your report has been submitted successfully. Thank you for your contribution."
-          );
-          router.push('/');
-        } else {
-            throw new Error("Server action failed to return an issue.");
-        }
-      } catch (err) {
-        console.error("Submission failed:", err);
-        toast({ variant: "destructive", title: t.submissionError, description: (err as Error).message || t.somethingWrong });
+      const result = await createIssue(data);
+      
+      if (result.success) {
+        toast({ title: t.reportSubmitted, description: t.thankYou });
+        speakInstructions(language === 'hi' 
+          ? "आपकी रिपोर्ट सफलतापूर्वक जमा कर दी गई है। धन्यवाद।"
+          : "Your report has been submitted successfully. Thank you for your contribution."
+        );
+        router.push('/');
+      } else {
+        toast({ variant: "destructive", title: t.submissionError, description: result.error || t.somethingWrong });
       }
     });
   }

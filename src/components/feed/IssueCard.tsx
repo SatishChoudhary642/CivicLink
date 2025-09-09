@@ -9,6 +9,7 @@ import { ArrowBigDown, ArrowBigUp, MessageSquare } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
+import { useIssues } from '@/context/IssueContext';
 import type { Issue } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -34,6 +35,7 @@ const getStatusVariant = (status: string) => {
 };
 
 export function IssueCard({ issue: initialIssue }: IssueCardProps) {
+  const { updateIssue } = useIssues();
   const [issue, setIssue] = useState(initialIssue);
   const [voteStatus, setVoteStatus] = useState<VoteStatus>(null);
   const { user } = useAuth();
@@ -61,11 +63,14 @@ export function IssueCard({ issue: initialIssue }: IssueCardProps) {
       newStatus = 'Open';
     }
     
-    setIssue({
+    const updatedIssue = {
       ...issue,
       votes: { up: newUpVotes, down: newDownVotes },
       status: newStatus,
-    });
+    };
+    
+    setIssue(updatedIssue);
+    updateIssue(issue.id, updatedIssue); // Update global state
   };
 
   return (
