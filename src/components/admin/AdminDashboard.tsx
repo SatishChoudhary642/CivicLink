@@ -83,7 +83,6 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
   }, [issues, statusFilter, categoryFilter, priorityFilter, searchQuery]);
   
   useEffect(() => {
-    // If the currently selected issue is filtered out, deselect it.
     if (selectedIssue && !filteredIssues.some(issue => issue.id === selectedIssue.id)) {
         setSelectedIssue(null);
     }
@@ -115,7 +114,6 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
     );
     setIssues(updatedIssues);
     
-    // Update selected issue as well if it's the one being changed
     if (selectedIssue && selectedIssue.id === issueId) {
         setSelectedIssue(prev => prev ? { ...prev, status: newStatus } : null);
     }
@@ -169,8 +167,7 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                 )}>
                     {/* Reports List */}
                     <div className={cn(
-                        "md:col-span-3 lg:col-span-4",
-                        selectedIssue && "md:col-span-1 lg:col-span-1"
+                        selectedIssue ? "md:col-span-1 lg:col-span-1" : "col-span-full"
                     )}>
                         <ScrollArea className="h-[600px] rounded-md border">
                             <div className="p-2 space-y-2">
