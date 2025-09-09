@@ -4,14 +4,13 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Issue } from '@/lib/types';
-import Link from 'next/link';
 
 // Fix for default icon issues with webpack
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default,
+  iconUrl: require('leaflet/dist/images/marker-icon.png').default,
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png').default,
 });
 
 
@@ -28,7 +27,7 @@ export function Map({ issues = [] }: MapProps) {
   useEffect(() => {
     if (mapRef.current && !mapInstanceRef.current) {
       const map = L.map(mapRef.current, {
-        center: [34.0522, -118.2437], // Default to Los Angeles
+        center: [18.5204, 73.8567], // Pune
         zoom: 12,
         scrollWheelZoom: true,
       });
