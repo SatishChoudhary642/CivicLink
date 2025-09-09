@@ -185,7 +185,7 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                       <TableCell>
                           <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
                       </TableCell>
-                      <TableCell>{issue.votes.up}</TableCell>
+                      <TableCell>{issue.votes.up - issue.votes.down}</TableCell>
                       <TableCell className="text-right">
                           <DropdownMenu>
                           <DropdownMenuTrigger asChild>

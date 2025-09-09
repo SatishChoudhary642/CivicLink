@@ -72,9 +72,12 @@ export default function Home() {
   
       issue.votes = voteCount;
 
-      // Check if the issue should be rejected
+      // Check if the issue should be rejected or re-opened
       if (issue.votes.up - issue.votes.down <= -10) {
         issue.status = 'Rejected';
+      } else if (issue.status === 'Rejected' && issue.votes.up - issue.votes.down > -10) {
+        // If a rejected issue gets enough upvotes to climb out of rejection, re-open it.
+        issue.status = 'Open';
       }
       
       newIssues[issueIndex] = issue;
@@ -107,7 +110,7 @@ export default function Home() {
                   size="sm"
                   className="h-8 w-8 p-1 text-muted-foreground hover:text-green-600"
                   onClick={() => handleVote(issue.id, 'up')}
-                  disabled={!user || issue.status === 'Rejected'}
+                  disabled={!user}
                 >
                   <ArrowBigUp className={`h-5 w-5 ${userVotes[issue.id] === 'up' ? 'fill-green-600 text-green-600' : ''}`} />
                 </Button>
@@ -117,7 +120,7 @@ export default function Home() {
                   size="sm"
                   className="h-8 w-8 p-1 text-muted-foreground hover:text-red-600"
                   onClick={() => handleVote(issue.id, 'down')}
-                  disabled={!user || issue.status === 'Rejected'}
+                  disabled={!user}
                 >
                   <ArrowBigDown className={`h-5 w-5 ${userVotes[issue.id] === 'down' ? 'fill-red-600 text-red-600' : ''}`} />
                 </Button>
