@@ -24,7 +24,7 @@ export function ReportDetails({ issue, onStatusChange, statuses, getPriorityClas
 
     if (!issue) {
         return (
-            <Card className="h-[658px] flex items-center justify-center">
+            <Card className="h-full flex items-center justify-center">
                 <div className="text-center text-muted-foreground">
                     <p>Select a report to see details</p>
                 </div>
