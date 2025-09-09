@@ -16,10 +16,24 @@ type VoteStatus = 'up' | 'down' | null;
 
 interface IssueCardProps {
   issue: Issue;
-  getStatusVariant: (status: string) => "default" | "secondary" | "destructive" | "outline";
 }
 
-export function IssueCard({ issue: initialIssue, getStatusVariant }: IssueCardProps) {
+const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'Open':
+        return 'secondary';
+      case 'In Progress':
+        return 'default';
+      case 'Resolved':
+        return 'outline';
+      case 'Rejected':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
+};
+
+export function IssueCard({ issue: initialIssue }: IssueCardProps) {
   const [issue, setIssue] = useState(initialIssue);
   const [voteStatus, setVoteStatus] = useState<VoteStatus>(null);
   const { user } = useAuth();
