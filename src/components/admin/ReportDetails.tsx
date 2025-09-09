@@ -11,22 +11,25 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { Eye, ChevronDown } from "lucide-react";
+import { Eye, ChevronDown, X } from "lucide-react";
 
 interface ReportDetailsProps {
     issue: Issue | null;
     onStatusChange: (issueId: string, newStatus: IssueStatus) => void;
     statuses: IssueStatus[];
     getPriorityClasses: (priority?: Priority) => string;
+    onClose: () => void;
 }
 
-export function ReportDetails({ issue, onStatusChange, statuses, getPriorityClasses }: ReportDetailsProps) {
+export function ReportDetails({ issue, onStatusChange, statuses, getPriorityClasses, onClose }: ReportDetailsProps) {
 
     if (!issue) {
         return (
-            <Card className="h-full flex items-center justify-center">
+            <Card className="h-full flex items-center justify-center bg-muted/30 border-dashed">
                 <div className="text-center text-muted-foreground">
-                    <p>Select a report to see details</p>
+                    <Eye className="mx-auto h-10 w-10 mb-4 text-muted-foreground/50" />
+                    <p className="font-medium">Select a report to view details</p>
+                    <p className="text-sm">Choose a report from the list on the left to get started.</p>
                 </div>
             </Card>
         );
@@ -44,11 +47,19 @@ export function ReportDetails({ issue, onStatusChange, statuses, getPriorityClas
 
 
     return (
-        <Card className="h-full">
+        <Card className="h-full relative">
+             <Button 
+                variant="ghost" 
+                size="icon" 
+                className="absolute top-2 right-2 h-7 w-7"
+                onClick={onClose}
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+            </Button>
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2 font-headline">
-                        <Eye className="h-6 w-6" />
                         Report Details
                     </CardTitle>
                      <DropdownMenu>

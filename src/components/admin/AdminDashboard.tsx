@@ -33,16 +33,6 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
 
   useEffect(() => {
-    // Select the first issue by default on initial load if it exists
-    if (filteredIssues.length > 0) {
-      setSelectedIssue(filteredIssues[0]);
-    } else {
-      setSelectedIssue(null)
-    }
-  }, [statusFilter, categoryFilter, priorityFilter, searchQuery, issues]);
-
-
-  useEffect(() => {
     const assessPriorities = async () => {
       const issuesToAssess = issues.filter(issue => !issue.priority);
       if (issuesToAssess.length === 0) return;
@@ -77,6 +67,13 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
 
     assessPriorities();
   }, []); // Only runs on mount
+  
+  useEffect(() => {
+    // If the currently selected issue is filtered out, deselect it.
+    if (selectedIssue && !filteredIssues.some(issue => issue.id === selectedIssue.id)) {
+        setSelectedIssue(null);
+    }
+  }, [selectedIssue, filteredIssues]);
 
   const statuses: IssueStatus[] = ["Open", "In Progress", "Resolved", "Rejected"];
   const priorities: Priority[] = ["High", "Medium", "Low"];
@@ -211,6 +208,7 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                           onStatusChange={handleStatusChange} 
                           statuses={statuses}
                           getPriorityClasses={getPriorityClasses}
+                          onClose={() => setSelectedIssue(null)}
                         />
                     </div>
                 </div>
