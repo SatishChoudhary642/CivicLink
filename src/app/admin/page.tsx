@@ -1,10 +1,13 @@
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
-import { issues } from "@/lib/data";
+import { dataStore } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export default function AdminPage() {
+    const issues = dataStore.getIssues();
     return (
         <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-muted/30 min-h-screen">
              <header className="mb-8">

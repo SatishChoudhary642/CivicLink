@@ -2,9 +2,8 @@
 
 import { z } from 'zod';
 import { categorizeUploadedImage } from '@/ai/flows/categorize-uploaded-image';
-import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { issues, getInitialUsers } from './data';
+import { getInitialUsers, dataStore } from './data';
 import type { Issue, IssueCategory } from './types';
 
 
@@ -89,8 +88,10 @@ export async function createIssue(values: z.infer<typeof FormSchema>) {
     };
     
     // In a real app, you would save to a database here.
-    // Prepending the new issue to the in-memory array.
-    issues.unshift(newIssue);
+    // We now use our localStorage-based dataStore.
+    const currentIssues = dataStore.getIssues();
+    const updatedIssues = [newIssue, ...currentIssues];
+    dataStore.saveIssues(updatedIssues);
     
     // Revalidate paths to ensure fresh data is fetched on navigation.
     revalidatePath('/');

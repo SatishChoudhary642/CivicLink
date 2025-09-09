@@ -1,4 +1,6 @@
-import { issues } from "@/lib/data";
+'use client';
+
+import { dataStore } from "@/lib/data";
 import {
   Table,
   TableBody,
@@ -10,12 +12,19 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import type { Issue } from "@/lib/types";
-
-// In a real app, you would get the current user from your authentication system.
-const currentUserId = "user-1";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect, useState } from "react";
 
 export default function MyReportsPage() {
-  const myIssues: Issue[] = issues.filter(issue => issue.reporter.id === currentUserId);
+  const { user } = useAuth();
+  const [myIssues, setMyIssues] = useState<Issue[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      const allIssues = dataStore.getIssues();
+      setMyIssues(allIssues.filter(issue => issue.reporter.id === user.id));
+    }
+  }, [user]);
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -43,6 +52,7 @@ export default function MyReportsPage() {
                 <TableRow>
                   <TableHead className="w-[300px]">Title</TableHead>
                   <TableHead>Category</TableHead>
+
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Date Reported</TableHead>
                 </TableRow>

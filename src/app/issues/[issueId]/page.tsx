@@ -1,6 +1,6 @@
 'use client';
 
-import { issues as initialIssues } from "@/lib/data";
+import { dataStore } from "@/lib/data";
 import { getInitialUsers } from "@/lib/data";
 import { notFound, useParams } from "next/navigation";
 import Image from "next/image";
@@ -12,25 +12,38 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
-import { useState } from "react";
-import type { Comment } from "@/lib/types";
+import { useState, useEffect } from "react";
+import type { Comment, Issue } from "@/lib/types";
 import { useAuth } from "@/context/AuthContext";
 
 export default function IssuePage() {
   const params = useParams();
   const issueId = params.issueId as string;
   const { user } = useAuth();
-  const [issues, setIssues] = useState(initialIssues);
-  const issue = issues.find(i => i.id === issueId);
+  
+  const [issue, setIssue] = useState<Issue | null>(null);
   const [newComment, setNewComment] = useState("");
-  const users = getInitialUsers(); // In a real app, this would come from a context or API
+  const users = getInitialUsers(); 
+
+  useEffect(() => {
+    const allIssues = dataStore.getIssues();
+    const currentIssue = allIssues.find(i => i.id === issueId);
+    if(currentIssue) {
+        setIssue(currentIssue);
+    }
+  }, [issueId]);
+
 
   if (!issue) {
-    notFound();
+    // You can render a loading state here until the issue is found
+    const issueFromStore = dataStore.getIssues().find(i => i.id === issueId);
+    if (!issueFromStore) {
+       return notFound();
+    }
+    setIssue(issueFromStore);
+    return null;
   }
-
-  // In a real app, you would get the current user from your authentication system.
-  // We get it from the AuthContext now, but need to find the full user object from the users list
+  
   const currentUser = user ? users.find(u => u.id === user.id) : null;
   
   const getStatusVariant = (status: string) => {
@@ -44,7 +57,7 @@ export default function IssuePage() {
   };
 
   const handlePostComment = () => {
-    if (!newComment.trim() || !currentUser) return;
+    if (!newComment.trim() || !currentUser || !issue) return;
 
     const comment: Comment = {
         id: `comment-${Date.now()}`,
@@ -53,17 +66,20 @@ export default function IssuePage() {
         createdAt: new Date().toISOString(),
     };
     
-    const updatedIssues = issues.map(i => {
+    const allIssues = dataStore.getIssues();
+    const updatedIssues = allIssues.map(i => {
         if (i.id === issue.id) {
-            return {
+            const updatedIssue = {
                 ...i,
                 comments: [...i.comments, comment]
-            }
+            };
+            setIssue(updatedIssue); // Update local state for immediate feedback
+            return updatedIssue;
         }
         return i;
     });
 
-    setIssues(updatedIssues);
+    dataStore.saveIssues(updatedIssues);
     setNewComment("");
   }
 

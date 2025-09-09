@@ -35,6 +35,14 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
 
   useEffect(() => {
     setIssuesWithPriority(allIssues);
+    if (allIssues.length > 0 && !selectedIssue) {
+        // Automatically select the first issue if none is selected
+        // setSelectedIssue(allIssues[0]);
+    } else if (selectedIssue) {
+        // If an issue is selected, make sure it's still in the list and update it
+        const updatedSelectedIssue = allIssues.find(i => i.id === selectedIssue.id);
+        setSelectedIssue(updatedSelectedIssue || null);
+    }
     
     const assessPriorities = async () => {
       const issuesToAssess = allIssues.filter(issue => !issue.priority);
@@ -197,7 +205,10 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                 </div>
 
                 {/* Main Content */}
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className={cn(
+                    "grid grid-cols-1 gap-6",
+                     selectedIssue && "md:grid-cols-3 lg:grid-cols-4"
+                )}>
                     <div className={cn(selectedIssue ? "md:col-span-1 lg:col-span-1" : "col-span-full")}>
                         <ReportsList />
                     </div>

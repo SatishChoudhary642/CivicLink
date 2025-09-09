@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { issues } from '@/lib/data';
+import { dataStore } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare } from 'lucide-react';
@@ -10,6 +10,8 @@ import { IssueCard } from '@/components/feed/IssueCard';
 export const dynamic = 'force-dynamic';
 
 export default function Home() {
+  const issues = dataStore.getIssues();
+
   return (
     <div className="bg-muted/40 min-h-screen">
       <div className="container mx-auto max-w-4xl p-4 md:p-8">

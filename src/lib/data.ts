@@ -1,8 +1,6 @@
 
 import type { Issue, IssueCategory, User } from './types';
 
-// Use a function to return a fresh copy of the initial users,
-// preventing issues with module caching.
 export const getInitialUsers = (): User[] => [
   {
     id: 'user-1',
@@ -38,11 +36,9 @@ export const getInitialUsers = (): User[] => [
   }
 ];
 
-// For simplicity in the prototype, we will manage users via AuthContext and localStorage.
-// We get a fresh copy to avoid module caching issues if we were to modify it directly.
 const users = getInitialUsers();
 
-export const issues: Issue[] = [
+const initialIssues: Issue[] = [
   {
     id: 'pune-1',
     title: 'Huge Pothole on FC Road',
@@ -424,6 +420,33 @@ export const issues: Issue[] = [
     comments: [],
   }
 ];
+
+const ISSUES_STORAGE_KEY = 'civiclink-issues';
+
+// This is a stand-in for a database.
+export const dataStore = {
+  getIssues: (): Issue[] => {
+    if (typeof window !== 'undefined') {
+      const storedIssues = localStorage.getItem(ISSUES_STORAGE_KEY);
+      if (storedIssues) {
+        return JSON.parse(storedIssues);
+      } else {
+        localStorage.setItem(ISSUES_STORAGE_KEY, JSON.stringify(initialIssues));
+        return initialIssues;
+      }
+    }
+    return initialIssues;
+  },
+  saveIssues: (issues: Issue[]) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(ISSUES_STORAGE_KEY, JSON.stringify(issues));
+    }
+  },
+};
+
+// We will now use the dataStore to get issues.
+export let issues = typeof window !== 'undefined' ? dataStore.getIssues() : initialIssues;
+
 
 export const issueCategories: IssueCategory[] = [
     "Garbage Dump / Overflowing Bins",
