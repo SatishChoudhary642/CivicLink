@@ -1,6 +1,10 @@
 
-import type { Issue, IssueCategory, User } from './types';
+'use client';
 
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import type { Issue, IssueCategory, User } from '@/lib/types';
+
+// Initial data functions and constants
 export const getInitialUsers = (): User[] => [
   {
     id: 'user-1',
@@ -421,33 +425,6 @@ const initialIssues: Issue[] = [
   }
 ];
 
-const ISSUES_STORAGE_KEY = 'civiclink-issues';
-
-// This is a stand-in for a database.
-export const dataStore = {
-  getIssues: (): Issue[] => {
-    if (typeof window !== 'undefined') {
-      const storedIssues = localStorage.getItem(ISSUES_STORAGE_KEY);
-      if (storedIssues) {
-        return JSON.parse(storedIssues);
-      } else {
-        localStorage.setItem(ISSUES_STORAGE_KEY, JSON.stringify(initialIssues));
-        return initialIssues;
-      }
-    }
-    return initialIssues;
-  },
-  saveIssues: (issues: Issue[]) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(ISSUES_STORAGE_KEY, JSON.stringify(issues));
-    }
-  },
-};
-
-// We will now use the dataStore to get issues.
-export let issues = typeof window !== 'undefined' ? dataStore.getIssues() : initialIssues;
-
-
 export const issueCategories: IssueCategory[] = [
     "Garbage Dump / Overflowing Bins",
     "Garbage Vehicle Not Arrived",
@@ -474,3 +451,90 @@ export const issueCategories: IssueCategory[] = [
     "Stray Animal Nuisance",
     "Other",
 ];
+
+const ISSUES_STORAGE_KEY = 'civiclink-issues';
+
+// Context type
+interface IssueContextType {
+  issues: Issue[];
+  users: User[];
+  addIssue: (issue: Issue) => void;
+  updateIssue: (issueId: string, updates: Partial<Issue>) => void;
+  getIssueById: (id: string) => Issue | undefined;
+}
+
+// Create context
+const IssueContext = createContext<IssueContextType | undefined>(undefined);
+
+// Provider component
+export const IssueProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const allUsers = getInitialUsers();
+
+  // Load issues from localStorage on mount
+  useEffect(() => {
+    // This code runs only on the client
+    const storedIssues = localStorage.getItem(ISSUES_STORAGE_KEY);
+    if (storedIssues) {
+      try {
+        setIssues(JSON.parse(storedIssues));
+      } catch (error) {
+        console.error('Failed to parse stored issues:', error);
+        setIssues(initialIssues);
+        localStorage.setItem(ISSUES_STORAGE_KEY, JSON.stringify(initialIssues));
+      }
+    } else {
+      setIssues(initialIssues);
+      localStorage.setItem(ISSUES_STORAGE_KEY, JSON.stringify(initialIssues));
+    }
+  }, []);
+
+  // Save to localStorage whenever issues change
+  useEffect(() => {
+    // Avoid writing the initial empty array to storage
+    if (issues.length > 0) {
+      localStorage.setItem(ISSUES_STORAGE_KEY, JSON.stringify(issues));
+    }
+  }, [issues]);
+
+  const addIssue = (newIssue: Issue) => {
+    setIssues(prev => [newIssue, ...prev]);
+  };
+
+  const updateIssue = (issueId: string, updates: Partial<Issue>) => {
+    setIssues(prev =>
+      prev.map(issue =>
+        issue.id === issueId ? { ...issue, ...updates } : issue
+      )
+    );
+  };
+
+  const getIssueById = (id: string) => {
+    return issues.find(issue => issue.id === id);
+  };
+
+  const value: IssueContextType = {
+    issues,
+    users: allUsers,
+    addIssue,
+    updateIssue,
+    getIssueById,
+  };
+
+  return (
+    <IssueContext.Provider value={value}>
+      {children}
+    </IssueContext.Provider>
+  );
+};
+
+// Custom hook to use the context
+export const useIssues = () => {
+  const context = useContext(IssueContext);
+  if (context === undefined) {
+    throw new Error('useIssues must be used within an IssueProvider');
+  }
+  return context;
+};
+
+    

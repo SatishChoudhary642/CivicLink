@@ -3,6 +3,7 @@ import './globals.css';
 import {Toaster} from '@/components/ui/toaster';
 import Header from '@/components/layout/Header';
 import { AuthProvider } from '@/context/AuthContext';
+import { IssueProvider } from '@/context/IssueContext';
 
 export const metadata: Metadata = {
   title: 'CivicLink',
@@ -29,11 +30,13 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <AuthProvider>
+          <IssueProvider>
             <div className="flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
             </div>
             <Toaster />
+          </IssueProvider>
         </AuthProvider>
       </body>
     </html>

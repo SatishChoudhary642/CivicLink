@@ -2,8 +2,7 @@
 
 import { z } from 'zod';
 import { categorizeUploadedImage } from '@/ai/flows/categorize-uploaded-image';
-import { revalidatePath } from 'next/cache';
-import { getInitialUsers, dataStore } from './data';
+import { getInitialUsers } from '@/context/IssueContext';
 import type { Issue, IssueCategory } from './types';
 
 
@@ -33,16 +32,23 @@ const FormSchema = z.object({
 // In a real app, you would get the current user from your authentication system.
 const currentUserId = "user-1";
 
-export async function createIssue(values: z.infer<typeof FormSchema>) {
+export async function createIssue(values: z.infer<typeof FormSchema>): Promise<Issue | null> {
     const validatedFields = FormSchema.safeParse(values);
     const users = getInitialUsers();
 
     if (!validatedFields.success) {
-        throw new Error('Invalid form data.');
+        console.error("Invalid form data:", validatedFields.error);
+        return null;
     }
     
     const { title, description, category, location, photoDataUri, latitude, longitude } = validatedFields.data;
-    const currentUser = users.find(u => u.id === currentUserId)!;
+    
+    // In a real app, the user would come from the session
+    const currentUser = users.find(u => u.id === currentUserId);
+    if (!currentUser) {
+        console.error("Could not find current user");
+        return null;
+    }
     
     let lat = 0;
     let lng = 0;
@@ -67,7 +73,6 @@ export async function createIssue(values: z.infer<typeof FormSchema>) {
         }
     }
 
-
     const newIssue: Issue = {
         id: `issue-${Date.now()}`,
         title,
@@ -87,13 +92,9 @@ export async function createIssue(values: z.infer<typeof FormSchema>) {
         comments: [],
     };
     
-    // In a real app, you would save to a database here.
-    // We now use our localStorage-based dataStore.
-    const currentIssues = dataStore.getIssues();
-    const updatedIssues = [newIssue, ...currentIssues];
-    dataStore.saveIssues(updatedIssues);
+    // We are now managing state on the client, so we don't save here.
+    // We just return the created issue.
+    // The `revalidatePath` calls are also no longer needed as context handles re-renders.
     
-    // Revalidate paths to ensure fresh data is fetched on navigation.
-    revalidatePath('/');
-    revalidatePath('/admin');
+    return newIssue;
 }

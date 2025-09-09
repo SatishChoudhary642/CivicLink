@@ -22,13 +22,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { issueCategories } from '@/lib/data';
+import { issueCategories } from '@/context/IssueContext';
 import { useState, useTransition, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Camera, Loader2, MapPin, Mic, MicOff, Volume2, Languages } from 'lucide-react';
 import { getCategoryForImage, createIssue } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { useIssues } from '@/context/IssueContext';
 
 const FormSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
@@ -177,6 +178,7 @@ export function ReportForm() {
   const [isPending, startTransition] = useTransition();
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
   const router = useRouter();
+  const { addIssue } = useIssues();
   
   // Speech recognition states
   const [isListening, setIsListening] = useState(false);
@@ -372,13 +374,18 @@ export function ReportForm() {
   function onSubmit(data: z.infer<typeof FormSchema>) {
     startTransition(async () => {
       try {
-        await createIssue(data);
-        toast({ title: t.reportSubmitted, description: t.thankYou });
-        speakInstructions(language === 'hi' 
-          ? "आपकी रिपोर्ट सफलतापूर्वक जमा कर दी गई है। धन्यवाद।"
-          : "Your report has been submitted successfully. Thank you for your contribution."
-        );
-        router.push('/');
+        const newIssue = await createIssue(data);
+        if (newIssue) {
+          addIssue(newIssue);
+          toast({ title: t.reportSubmitted, description: t.thankYou });
+          speakInstructions(language === 'hi' 
+            ? "आपकी रिपोर्ट सफलतापूर्वक जमा कर दी गई है। धन्यवाद।"
+            : "Your report has been submitted successfully. Thank you for your contribution."
+          );
+          router.push('/');
+        } else {
+            throw new Error("Failed to create issue.");
+        }
       } catch (err) {
         toast({ variant: "destructive", title: t.submissionError, description: t.somethingWrong });
       }

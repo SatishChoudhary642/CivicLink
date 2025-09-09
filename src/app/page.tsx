@@ -1,16 +1,10 @@
-import Link from 'next/link';
-import { dataStore } from '@/lib/data';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { MessageSquare } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { IssueCard } from '@/components/feed/IssueCard';
+'use client';
 
-export const dynamic = 'force-dynamic';
+import { IssueCard } from '@/components/feed/IssueCard';
+import { useIssues } from '@/context/IssueContext';
 
 export default function Home() {
-  const issues = dataStore.getIssues();
+  const { issues } = useIssues();
 
   return (
     <div className="bg-muted/40 min-h-screen">

@@ -1,23 +1,23 @@
 'use client';
 
-import { dataStore } from '@/lib/data';
 import type { Issue } from '@/lib/types';
 import MapLoader from '@/components/map/MapLoader';
+import { useIssues } from '@/context/IssueContext';
 import { useEffect, useState } from 'react';
 
 export default function MapPage() {
+  const { issues } = useIssues();
   const [issuesWithLocations, setIssuesWithLocations] = useState<Issue[]>([]);
 
   useEffect(() => {
-    const allIssues = dataStore.getIssues();
-    const filtered = allIssues.filter(
+    const filtered = issues.filter(
       (issue) => 
         issue.location && 
         typeof issue.location.lat === 'number' && 
         typeof issue.location.lng === 'number'
     );
     setIssuesWithLocations(filtered);
-  }, []);
+  }, [issues]);
 
   return (
     <div className="h-[calc(100vh-3.5rem)] flex flex-col">

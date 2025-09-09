@@ -1,6 +1,5 @@
 'use client';
 
-import { dataStore } from "@/lib/data";
 import {
   Table,
   TableBody,
@@ -13,18 +12,19 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import type { Issue } from "@/lib/types";
 import { useAuth } from "@/context/AuthContext";
+import { useIssues } from "@/context/IssueContext";
 import { useEffect, useState } from "react";
 
 export default function MyReportsPage() {
   const { user } = useAuth();
+  const { issues } = useIssues();
   const [myIssues, setMyIssues] = useState<Issue[]>([]);
 
   useEffect(() => {
     if (user) {
-      const allIssues = dataStore.getIssues();
-      setMyIssues(allIssues.filter(issue => issue.reporter.id === user.id));
+      setMyIssues(issues.filter(issue => issue.reporter.id === user.id));
     }
-  }, [user]);
+  }, [user, issues]);
 
   const getStatusVariant = (status: string) => {
     switch (status) {

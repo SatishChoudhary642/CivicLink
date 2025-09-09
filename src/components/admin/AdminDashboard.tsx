@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import type { Issue, IssueStatus, Priority } from "@/lib/types";
-import { issueCategories } from "@/lib/data";
+import { issueCategories } from "@/context/IssueContext";
 import { predictIssuePriority } from "@/ai/flows/predict-issue-priority";
 import {
   Select,
@@ -20,12 +20,14 @@ import { cn } from "@/lib/utils";
 import { DashboardStats } from "./DashboardStats";
 import { ReportDetails } from "./ReportDetails";
 import { Search } from "lucide-react";
+import { useIssues } from "@/context/IssueContext";
 
 interface AdminDashboardProps {
   allIssues: Issue[];
 }
 
 export function AdminDashboard({ allIssues }: AdminDashboardProps) {
+  const { updateIssue } = useIssues();
   const [issuesWithPriority, setIssuesWithPriority] = useState<Issue[]>(allIssues);
   const [statusFilter, setStatusFilter] = useState<string>("All");
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
@@ -35,11 +37,7 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
 
   useEffect(() => {
     setIssuesWithPriority(allIssues);
-    if (allIssues.length > 0 && !selectedIssue) {
-        // Automatically select the first issue if none is selected
-        // setSelectedIssue(allIssues[0]);
-    } else if (selectedIssue) {
-        // If an issue is selected, make sure it's still in the list and update it
+    if (allIssues.length > 0 && selectedIssue) {
         const updatedSelectedIssue = allIssues.find(i => i.id === selectedIssue.id);
         setSelectedIssue(updatedSelectedIssue || null);
     }
@@ -64,11 +62,16 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
       const newIssues = allIssues.map(issue => {
         const foundResult = results.find(res => res.issueId === issue.id);
         if (foundResult) {
-          return {
+          const updatedIssue = {
             ...issue,
             priority: foundResult.priority,
             priorityJustification: foundResult.justification
-          }
+          };
+          updateIssue(issue.id, { 
+            priority: foundResult.priority, 
+            priorityJustification: foundResult.justification 
+          });
+          return updatedIssue;
         }
         return issue;
       });
@@ -76,7 +79,7 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
     };
 
     assessPriorities();
-  }, [allIssues]);
+  }, [allIssues, updateIssue, selectedIssue]);
   
   const statuses: IssueStatus[] = ["Open", "In Progress", "Resolved", "Rejected"];
   const priorities: Priority[] = ["High", "Medium", "Low"];
@@ -117,10 +120,7 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
   }
   
   const handleStatusChange = (issueId: string, newStatus: IssueStatus) => {
-    const updatedIssues = issuesWithPriority.map((issue) =>
-      issue.id === issueId ? { ...issue, status: newStatus } : issue
-    );
-    setIssuesWithPriority(updatedIssues);
+    updateIssue(issueId, { status: newStatus });
     
     if (selectedIssue && selectedIssue.id === issueId) {
         setSelectedIssue(prev => prev ? { ...prev, status: newStatus } : null);
@@ -205,15 +205,18 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
                 </div>
 
                 {/* Main Content */}
-                <div className={cn(
+                 <div className={cn(
                     "grid grid-cols-1 gap-6",
-                     selectedIssue && "md:grid-cols-3 lg:grid-cols-4"
+                     selectedIssue && "lg:grid-cols-3"
                 )}>
-                    <div className={cn(selectedIssue ? "md:col-span-1 lg:col-span-1" : "col-span-full")}>
+                    <div className={cn(
+                        "transition-all duration-300",
+                        selectedIssue ? "lg:col-span-1" : "lg:col-span-3"
+                    )}>
                         <ReportsList />
                     </div>
                     {selectedIssue && (
-                        <div className="md:col-span-2 lg:col-span-3">
+                        <div className="lg:col-span-2">
                            <ReportDetails 
                               issue={selectedIssue} 
                               onStatusChange={handleStatusChange} 

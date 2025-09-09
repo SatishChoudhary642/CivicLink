@@ -1,27 +1,28 @@
 'use client';
 
-import { dataStore, getInitialUsers } from "@/lib/data";
-import type { Issue } from "@/lib/types";
+import type { Issue, User } from "@/lib/types";
 import { UserProfile } from "@/components/profile/UserProfile";
 import { notFound, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useIssues } from "@/context/IssueContext";
 
 export default function ProfilePage() {
   const params = useParams();
   const userId = params.userId as string;
-  const users = getInitialUsers();
-  const user = users.find(u => u.id === userId);
+  const { users, issues } = useIssues();
+  const [user, setUser] = useState<User | null>(null);
   const [userIssues, setUserIssues] = useState<Issue[]>([]);
 
   useEffect(() => {
-    if (user) {
-      const allIssues = dataStore.getIssues();
-      setUserIssues(allIssues.filter(issue => issue.reporter.id === user.id));
+    const foundUser = users.find(u => u.id === userId);
+    if (foundUser) {
+      setUser(foundUser);
+      setUserIssues(issues.filter(issue => issue.reporter.id === foundUser.id));
     }
-  }, [user]);
+  }, [userId, users, issues]);
 
   if (!user) {
-    notFound();
+    return notFound();
   }
 
   return (

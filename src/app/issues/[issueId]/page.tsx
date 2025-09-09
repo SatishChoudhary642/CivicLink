@@ -1,7 +1,5 @@
 'use client';
 
-import { dataStore } from "@/lib/data";
-import { getInitialUsers } from "@/lib/data";
 import { notFound, useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,36 +13,34 @@ import { MessageSquare } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Comment, Issue } from "@/lib/types";
 import { useAuth } from "@/context/AuthContext";
+import { useIssues } from "@/context/IssueContext";
 
 export default function IssuePage() {
   const params = useParams();
   const issueId = params.issueId as string;
   const { user } = useAuth();
   
+  const { getIssueById, updateIssue } = useIssues();
+  
   const [issue, setIssue] = useState<Issue | null>(null);
   const [newComment, setNewComment] = useState("");
-  const users = getInitialUsers(); 
 
   useEffect(() => {
-    const allIssues = dataStore.getIssues();
-    const currentIssue = allIssues.find(i => i.id === issueId);
+    const currentIssue = getIssueById(issueId);
     if(currentIssue) {
         setIssue(currentIssue);
     }
-  }, [issueId]);
+  }, [issueId, getIssueById]);
 
 
   if (!issue) {
-    // You can render a loading state here until the issue is found
-    const issueFromStore = dataStore.getIssues().find(i => i.id === issueId);
+    const issueFromStore = getIssueById(issueId);
     if (!issueFromStore) {
        return notFound();
     }
     setIssue(issueFromStore);
     return null;
   }
-  
-  const currentUser = user ? users.find(u => u.id === user.id) : null;
   
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -57,29 +53,20 @@ export default function IssuePage() {
   };
 
   const handlePostComment = () => {
-    if (!newComment.trim() || !currentUser || !issue) return;
+    if (!newComment.trim() || !user || !issue) return;
 
     const comment: Comment = {
         id: `comment-${Date.now()}`,
         text: newComment,
-        user: currentUser,
+        user: user,
         createdAt: new Date().toISOString(),
     };
     
-    const allIssues = dataStore.getIssues();
-    const updatedIssues = allIssues.map(i => {
-        if (i.id === issue.id) {
-            const updatedIssue = {
-                ...i,
-                comments: [...i.comments, comment]
-            };
-            setIssue(updatedIssue); // Update local state for immediate feedback
-            return updatedIssue;
-        }
-        return i;
-    });
-
-    dataStore.saveIssues(updatedIssues);
+    const updatedComments = [...issue.comments, comment];
+    updateIssue(issue.id, { comments: updatedComments });
+    
+    // Update local state for immediate feedback
+    setIssue(prev => prev ? { ...prev, comments: updatedComments } : null);
     setNewComment("");
   }
 
