@@ -3,7 +3,6 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import type { Issue, IssueCategory, User } from '@/lib/types';
-import { getUsers } from '@/lib/users';
 
 
 export const issueCategories: IssueCategory[] = [
@@ -46,19 +45,15 @@ interface IssueContextType {
 // Create context
 const IssueContext = createContext<IssueContextType | undefined>(undefined);
 
-// Provider component
-export const IssueProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [issues, setIssues] = useState<Issue[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+interface IssueProviderProps {
+  children: ReactNode;
+  initialUsers: User[];
+}
 
-  useEffect(() => {
-    // Fetch users on the client side
-    const fetchUsers = async () => {
-      const allUsers = await getUsers();
-      setUsers(allUsers);
-    };
-    fetchUsers();
-  }, []);
+// Provider component
+export const IssueProvider: React.FC<IssueProviderProps> = ({ children, initialUsers }) => {
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const [users, setUsers] = useState<User[]>(initialUsers);
 
   const addIssue = useCallback((newIssue: Issue) => {
     setIssues(prev => [newIssue, ...prev]);

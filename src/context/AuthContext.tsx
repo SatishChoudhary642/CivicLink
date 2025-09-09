@@ -3,9 +3,9 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User } from '@/lib/types';
-import { getUsers } from '@/lib/users';
 import { signupUser } from '@/lib/actions';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useIssues } from './IssueContext';
 
 interface AuthContextType {
   user: User | null;
@@ -34,6 +34,7 @@ const adminCredentials = {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const { users } = useIssues();
 
   useEffect(() => {
     setLoading(true);
@@ -63,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     
     // For prototype, we'll just find a user by email. Password isn't checked.
-    const allUsers = await getUsers();
+    const allUsers = users;
     const foundUser = allUsers.find((u: User) => u.email.toLowerCase() === email.toLowerCase());
 
     if (foundUser) {

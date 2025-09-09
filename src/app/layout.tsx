@@ -4,17 +4,20 @@ import {Toaster} from '@/components/ui/toaster';
 import Header from '@/components/layout/Header';
 import { AuthProvider } from '@/context/AuthContext';
 import { IssueProvider } from '@/context/IssueContext';
+import { getUsers } from '@/lib/users';
 
 export const metadata: Metadata = {
   title: 'CivicLink',
   description: 'Report and track civic issues in your community.',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialUsers = await getUsers();
+
   return (
     <html lang="en">
       <head>
@@ -29,15 +32,15 @@ export default function RootLayout({
           crossOrigin=""/>
       </head>
       <body className="font-body antialiased">
-        <AuthProvider>
-          <IssueProvider>
+        <IssueProvider initialUsers={initialUsers}>
+          <AuthProvider>
             <div className="flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
             </div>
             <Toaster />
-          </IssueProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </IssueProvider>
       </body>
     </html>
   );
