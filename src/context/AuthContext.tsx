@@ -5,7 +5,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User } from '@/lib/types';
 import { signupUser } from '@/lib/actions';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useIssues } from './IssueContext';
 
 interface AuthContextType {
   user: User | null;
@@ -22,25 +21,22 @@ const adminUser: User = {
     id: 'admin',
     name: 'Admin User',
     email: 'admin@gmail.com',
+    password: '123',
     avatarUrl: 'https://picsum.photos/seed/Admin/40/40',
     karma: 999,
     civicScore: 9999
 };
-const adminCredentials = {
-    email: 'admin@gmail.com',
-    password: '123'
-};
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+
+export function AuthProvider({ children, initialUsers }: { children: React.ReactNode, initialUsers: User[] }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const { users } = useIssues();
-
+  
   useEffect(() => {
     setLoading(true);
     try {
         // Check for a logged-in user in localStorage on initial load
-        let storedUser = localStorage.getItem('civiclink-user');
+        const storedUser = localStorage.getItem('civiclink-user');
         if (storedUser) {
             setUser(JSON.parse(storedUser));
         }
@@ -55,18 +51,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
-
-    if (email.toLowerCase() === adminCredentials.email && password === adminCredentials.password) {
+    
+    if (email.toLowerCase() === adminUser.email && password === adminUser.password) {
         localStorage.setItem('civiclink-user', JSON.stringify(adminUser));
         setUser(adminUser);
         setLoading(false);
         return adminUser;
     }
     
-    // For prototype, we'll just find a user by email. Password isn't checked.
-    const foundUser = users.find((u: User) => u.email.toLowerCase() === email.toLowerCase());
+    // For prototype, we'll check against the initial users list passed as a prop.
+    const foundUser = initialUsers.find((u: User) => u.email.toLowerCase() === email.toLowerCase());
 
-    if (foundUser) {
+    if (foundUser && foundUser.password === password) {
       localStorage.setItem('civiclink-user', JSON.stringify(foundUser));
       setUser(foundUser);
       setLoading(false);
@@ -88,6 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const result = await signupUser({ name, email, password });
       if (result.success && result.user) {
+        // Refetch users might be needed here in a real app, but for now we proceed
         return result.user;
       } else {
         throw new Error(result.error || "An unexpected error occurred during signup.");

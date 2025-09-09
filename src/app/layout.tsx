@@ -33,7 +33,7 @@ export default async function RootLayout({
       </head>
       <body className="font-body antialiased">
         <IssueProvider initialUsers={initialUsers}>
-          <AuthProvider>
+          <AuthProvider initialUsers={initialUsers}>
             <div className="flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>

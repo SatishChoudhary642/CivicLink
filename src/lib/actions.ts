@@ -136,6 +136,7 @@ export async function signupUser(
       id: `user-${Date.now()}`,
       name,
       email,
+      password, // Save the password
       avatarUrl: `https://picsum.photos/seed/${name}/40/40`,
       karma: 0,
       civicScore: 0,

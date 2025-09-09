@@ -33,6 +33,7 @@ export type User = {
   id: string;
   name: string;
   email: string;
+  password?: string; // For prototype only
   avatarUrl: string;
   karma: number;
   civicScore: number;
