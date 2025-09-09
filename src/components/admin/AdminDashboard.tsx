@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -68,13 +69,6 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
     assessPriorities();
   }, []); // Only runs on mount
   
-  useEffect(() => {
-    // If the currently selected issue is filtered out, deselect it.
-    if (selectedIssue && !filteredIssues.some(issue => issue.id === selectedIssue.id)) {
-        setSelectedIssue(null);
-    }
-  }, [selectedIssue, filteredIssues]);
-
   const statuses: IssueStatus[] = ["Open", "In Progress", "Resolved", "Rejected"];
   const priorities: Priority[] = ["High", "Medium", "Low"];
 
@@ -87,6 +81,13 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
       return statusMatch && categoryMatch && priorityMatch && searchMatch;
     });
   }, [issues, statusFilter, categoryFilter, priorityFilter, searchQuery]);
+  
+  useEffect(() => {
+    // If the currently selected issue is filtered out, deselect it.
+    if (selectedIssue && !filteredIssues.some(issue => issue.id === selectedIssue.id)) {
+        setSelectedIssue(null);
+    }
+  }, [selectedIssue, filteredIssues]);
 
 
   const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
