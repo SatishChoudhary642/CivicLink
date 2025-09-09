@@ -30,6 +30,7 @@ import { Camera, Loader2, MapPin, Mic, MicOff, Volume2, Languages } from 'lucide
 import { getCategoryForImage, createIssue } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 const FormSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
@@ -178,6 +179,7 @@ export function ReportForm() {
   const [isPending, startTransition] = useTransition();
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
   const router = useRouter();
+  const { user } = useAuth();
   
   // Speech recognition states
   const [isListening, setIsListening] = useState(false);
@@ -372,7 +374,7 @@ export function ReportForm() {
   
   function onSubmit(data: z.infer<typeof FormSchema>) {
     startTransition(async () => {
-      const result = await createIssue(data);
+      const result = await createIssue(data, user);
       
       if (result.success) {
         toast({ title: t.reportSubmitted, description: t.thankYou });

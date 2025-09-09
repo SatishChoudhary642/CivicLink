@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { categorizeUploadedImage } from '@/ai/flows/categorize-uploaded-image';
 import { getIssues, saveIssues } from '@/lib/data';
 import { getInitialUsers } from '@/lib/users';
-import type { Issue, IssueCategory } from './types';
+import type { Issue, IssueCategory, User } from './types';
 
 
 export async function getCategoryForImage(photoDataUri: string) {
@@ -32,26 +32,22 @@ const FormSchema = z.object({
     photoDataUri: z.string().min(1, { message: 'Please upload a photo.'}),
 });
 
-// In a real app, you would get the current user from your authentication system.
-const currentUserId = "user-1";
-
-export async function createIssue(values: z.infer<typeof FormSchema>): Promise<{ success: boolean; error?: string }> {
+export async function createIssue(
+    values: z.infer<typeof FormSchema>,
+    user: User | null
+): Promise<{ success: boolean; error?: string }> {
     const validatedFields = FormSchema.safeParse(values);
     
     if (!validatedFields.success) {
         console.error("Invalid form data:", validatedFields.error.flatten().fieldErrors);
         return { success: false, error: "Invalid form data." };
     }
+
+    if (!user) {
+        return { success: false, error: "You must be logged in to create an issue." };
+    }
     
     const { title, description, category, location, photoDataUri, latitude, longitude } = validatedFields.data;
-    
-    const users = getInitialUsers();
-    const currentUser = users.find(u => u.id === currentUserId);
-    if (!currentUser) {
-        const errorMsg = "Could not find current user";
-        console.error(errorMsg);
-        return { success: false, error: errorMsg };
-    }
     
     let lat = 0;
     let lng = 0;
@@ -90,7 +86,7 @@ export async function createIssue(values: z.infer<typeof FormSchema>): Promise<{
         },
         votes: { up: 1, down: 0 },
         createdAt: new Date().toISOString(),
-        reporter: currentUser,
+        reporter: user,
         comments: [],
     };
 
