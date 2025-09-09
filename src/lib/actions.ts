@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { categorizeUploadedImage } from '@/ai/flows/categorize-uploaded-image';
 import { getIssues, saveIssues } from '@/lib/data';
-import { getInitialUsers } from '@/lib/users';
+import { getUsers, saveUsers } from '@/lib/users';
 import type { Issue, IssueCategory, User } from './types';
 
 
@@ -22,7 +22,7 @@ export async function getCategoryForImage(photoDataUri: string) {
   }
 }
 
-const FormSchema = z.object({
+const IssueFormSchema = z.object({
     title: z.string().min(5),
     description: z.string().min(10),
     category: z.string(),
@@ -33,10 +33,10 @@ const FormSchema = z.object({
 });
 
 export async function createIssue(
-    values: z.infer<typeof FormSchema>,
+    values: z.infer<typeof IssueFormSchema>,
     user: User | null
 ): Promise<{ success: boolean; error?: string }> {
-    const validatedFields = FormSchema.safeParse(values);
+    const validatedFields = IssueFormSchema.safeParse(values);
     
     if (!validatedFields.success) {
         console.error("Invalid form data:", validatedFields.error.flatten().fieldErrors);
@@ -105,4 +105,52 @@ export async function createIssue(
         console.error(errorMsg, error);
         return { success: false, error: errorMsg };
     }
+}
+
+
+const SignupFormSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+export async function signupUser(
+  values: z.infer<typeof SignupFormSchema>
+): Promise<{ success: boolean; error?: string; user?: User }> {
+  const validatedFields = SignupFormSchema.safeParse(values);
+    
+  if (!validatedFields.success) {
+      return { success: false, error: "Invalid form data." };
+  }
+
+  const { name, email, password } = validatedFields.data;
+  
+  const users = await getUsers();
+  
+  const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  if (existingUser) {
+      return { success: false, error: "An account with this email already exists." };
+  }
+
+  const newUser: User = {
+      id: `user-${Date.now()}`,
+      name,
+      email,
+      avatarUrl: `https://picsum.photos/seed/${name}/40/40`,
+      karma: 0,
+      civicScore: 0,
+  };
+
+  try {
+    const updatedUsers = [...users, newUser];
+    await saveUsers(updatedUsers);
+    
+    revalidatePath('/admin');
+
+    return { success: true, user: newUser };
+  } catch(error) {
+      const errorMsg = "Failed to save the new user.";
+      console.error(errorMsg, error);
+      return { success: false, error: errorMsg };
+  }
 }

@@ -3,7 +3,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User } from '@/lib/types';
-import { getInitialUsers } from '@/lib/users';
+import { getUsers } from '@/lib/users';
+import { signupUser } from '@/lib/actions';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface AuthContextType {
@@ -30,43 +31,21 @@ const adminCredentials = {
     password: '123'
 };
 
-const USERS_STORAGE_KEY = 'civiclink-users';
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
     try {
-        // Load users from localStorage or use initial data
-        const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
-        const initialUsers = storedUsers ? JSON.parse(storedUsers) : getInitialUsers();
-        setAllUsers(initialUsers);
-
         // Check for a logged-in user in localStorage on initial load
         let storedUser = localStorage.getItem('civiclink-user');
         if (storedUser) {
-            const parsedUser = JSON.parse(storedUser);
-            if (parsedUser.id === 'admin') {
-                setUser(adminUser);
-            } else {
-                const foundUser = initialUsers.find((u: User) => u.id === parsedUser.id);
-                if (foundUser) setUser(foundUser);
-            }
-        } else {
-            // If no user is stored, default to the first user for easier development
-            const defaultUser = initialUsers[0];
-            if (defaultUser) {
-                localStorage.setItem('civiclink-user', JSON.stringify(defaultUser));
-                setUser(defaultUser);
-            }
+            setUser(JSON.parse(storedUser));
         }
     } catch (error) {
         console.error("Failed to initialize auth from localStorage", error);
         localStorage.removeItem('civiclink-user');
-        localStorage.removeItem(USERS_STORAGE_KEY);
     }
     setLoading(false);
   }, []);
@@ -84,6 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     
     // For prototype, we'll just find a user by email. Password isn't checked.
+    const allUsers = await getUsers();
     const foundUser = allUsers.find((u: User) => u.email.toLowerCase() === email.toLowerCase());
 
     if (foundUser) {
@@ -104,34 +84,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signup = async (name: string, email: string, password: string): Promise<User> => {
      setLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
     
-    const existingUser = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (existingUser) {
+    try {
+      const result = await signupUser({ name, email, password });
+      if (result.success && result.user) {
+        return result.user;
+      } else {
+        throw new Error(result.error || "An unexpected error occurred during signup.");
+      }
+    } catch (error) {
+        throw error;
+    } finally {
         setLoading(false);
-        throw new Error("An account with this email already exists.");
     }
-
-    const newUser: User = {
-        id: `user-${Date.now()}`,
-        name,
-        email,
-        avatarUrl: `https://picsum.photos/seed/${name}/40/40`,
-        karma: 0,
-        civicScore: 0,
-    };
-    
-    const updatedUsers = [...allUsers, newUser];
-    setAllUsers(updatedUsers);
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(updatedUsers));
-    
-    setLoading(false);
-    return newUser;
   };
 
   // Display a loading skeleton while checking auth status
-  if (loading && allUsers.length === 0) {
+  if (loading) {
       return (
            <div className="flex min-h-screen flex-col">
               <header className="sticky top-0 z-50 w-full border-b bg-background/95">

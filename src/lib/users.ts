@@ -1,36 +1,30 @@
-import type { User } from '@/lib/types';
 
-export const getInitialUsers = (): User[] => [
-  {
-    id: 'user-1',
-    name: 'Aarav Sharma',
-    email: 'aarav.sharma@example.com',
-    avatarUrl: 'https://picsum.photos/seed/Aarav/40/40',
-    karma: 0,
-    civicScore: 0,
-  },
-  {
-    id: 'user-2',
-    name: 'Priya Patel',
-    email: 'priya.patel@example.com',
-    avatarUrl: 'https://picsum.photos/seed/Priya/40/40',
-    karma: 0,
-    civicScore: 0,
-  },
-  {
-    id: 'user-3',
-    name: 'Rohan Mehta',
-    email: 'rohan.mehta@example.com',
-    avatarUrl: 'https://picsum.photos/seed/Rohan/40/40',
-    karma: 0,
-    civicScore: 0,
-  },
-  {
-    id: 'user-4',
-    name: 'Saanvi Singh',
-    email: 'saanvi.singh@example.com',
-    avatarUrl: 'https://picsum.photos/seed/Saanvi/40/40',
-    karma: 0,
-    civicScore: 0,
-  },
-];
+import type { User } from '@/lib/types';
+import fs from 'fs/promises';
+import path from 'path';
+
+// Define the path to the data file
+const dataPath = path.join(process.cwd(), 'src', 'data', 'users.json');
+
+
+// Function to read users from the JSON file
+export const getUsers = async (): Promise<User[]> => {
+  try {
+    const jsonData = await fs.readFile(dataPath, 'utf-8');
+    return JSON.parse(jsonData);
+  } catch (error) {
+    console.error('Could not read users.json:', error);
+    // If the file doesn't exist or is empty, return an empty array
+    return [];
+  }
+};
+
+// Function to save users to the JSON file
+export const saveUsers = async (users: User[]): Promise<void> => {
+  try {
+    const jsonData = JSON.stringify(users, null, 2);
+    await fs.writeFile(dataPath, jsonData, 'utf-8');
+  } catch (error) {
+    console.error('Could not write to users.json:', error);
+  }
+};
