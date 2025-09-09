@@ -64,8 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     
     // For prototype, we'll just find a user by email. Password isn't checked.
-    const allUsers = users;
-    const foundUser = allUsers.find((u: User) => u.email.toLowerCase() === email.toLowerCase());
+    const foundUser = users.find((u: User) => u.email.toLowerCase() === email.toLowerCase());
 
     if (foundUser) {
       localStorage.setItem('civiclink-user', JSON.stringify(foundUser));
