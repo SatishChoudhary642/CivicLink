@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 import type { Issue, IssueStatus, Priority } from "@/lib/types";
 import { issueCategories } from "@/context/IssueContext";
 import { predictIssuePriority } from "@/ai/flows/predict-issue-priority";
+import { analyzeInfrastructureGaps, type AnalyzeInfrastructureGapsOutput } from "@/ai/flows/analyze-infrastructure-gaps";
 import {
   Select,
   SelectContent,
@@ -14,13 +15,22 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { DashboardStats } from "./DashboardStats";
 import { ReportDetails } from "./ReportDetails";
-import { Search } from "lucide-react";
+import { Search, Lightbulb, Link as LinkIcon } from "lucide-react";
 import { useIssues } from "@/context/IssueContext";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Skeleton } from "../ui/skeleton";
+import Link from "next/link";
+
 
 interface AdminDashboardProps {
   allIssues: Issue[];
@@ -34,6 +44,8 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
   const [priorityFilter, setPriorityFilter] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+  const [analysis, setAnalysis] = useState<AnalyzeInfrastructureGapsOutput | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(true);
 
   useEffect(() => {
     setIssuesWithPriority(allIssues);
@@ -78,7 +90,22 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
       setIssuesWithPriority(newIssues);
     };
 
+    const runInfrastructureAnalysis = async () => {
+        setIsAnalyzing(true);
+        try {
+            const result = await analyzeInfrastructureGaps({ issues: allIssues });
+            setAnalysis(result);
+        } catch (error) {
+            console.error("Infrastructure analysis failed:", error);
+            setAnalysis({ gapAnalysis: [] }); // Set empty on error
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
     assessPriorities();
+    runInfrastructureAnalysis();
+
   }, [allIssues, updateIssue, selectedIssue]);
   
   const statuses: IssueStatus[] = ["Open", "In Progress", "Resolved", "Rejected"];
@@ -164,9 +191,70 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
     </ScrollArea>
   );
 
+  const AnalysisSection = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Lightbulb className="text-yellow-500" />
+          AI Infrastructure Analysis
+        </CardTitle>
+        <CardDescription>
+            AI-powered suggestions based on recurring issue patterns.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+          {isAnalyzing ? (
+              <div className="space-y-4">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+              </div>
+          ) : analysis && analysis.gapAnalysis.length > 0 ? (
+            <Accordion type="single" collapsible className="w-full">
+              {analysis.gapAnalysis.map((gap, index) => (
+                <AccordionItem value={`item-${index}`} key={index}>
+                  <AccordionTrigger>
+                    <div className="flex flex-col items-start text-left">
+                        <span className="font-semibold">{gap.problemArea}: {gap.problemType}</span>
+                        <span className="text-sm font-normal text-muted-foreground">{gap.suggestion}</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                      <div className="space-y-2 pl-2 border-l-2 ml-2 border-primary/50">
+                        <p className="text-sm font-semibold">Reasoning:</p>
+                        <p className="text-sm text-muted-foreground italic">&quot;{gap.reasoning}&quot;</p>
+                        <p className="text-sm font-semibold pt-2">Supporting Reports:</p>
+                        <ul className="list-disc pl-5 text-sm space-y-1">
+                            {gap.supportingIssueIds.map(id => {
+                                const issue = allIssues.find(i => i.id === id);
+                                return issue ? (
+                                    <li key={id}>
+                                        <Link href={`/issues/${id}`} target="_blank" className="text-primary hover:underline flex items-center gap-1">
+                                            {issue.title} <LinkIcon className="h-3 w-3" />
+                                        </Link>
+                                    </li>
+                                ) : null
+                            })}
+                        </ul>
+                      </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          ) : (
+            <div className="p-4 text-center text-muted-foreground border-dashed border rounded-md">
+                <p>Not enough data to perform analysis.</p>
+                <p className="text-xs">At least 5 reports are needed.</p>
+            </div>
+          )}
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="space-y-8">
         <DashboardStats issues={allIssues} />
+        <AnalysisSection />
         
         <Card>
             <CardContent className="p-4">
