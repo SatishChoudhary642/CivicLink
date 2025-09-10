@@ -1,6 +1,35 @@
 
 [
   {
+    "id": "issue-1757478922617",
+    "title": "Illegal Dumping Near Lake",
+    "description": "Large amounts of construction debris and garbage have been illegally dumped near the lake entrance, blocking the path.",
+    "category": "Illegal Dumping / Debris",
+    "status": "Open",
+    "imageUrl": "https://picsum.photos/seed/dumping-debris/600/400",
+    "imageHint": "dumping debris",
+    "location": {
+      "lat": 18.5806299,
+      "lng": 73.9833099,
+      "address": "Wagholi, Pune, Pune District, Maharashtra, 411023, India"
+    },
+    "votes": {
+      "up": 1,
+      "down": 0
+    },
+    "createdAt": "2025-09-10T04:35:22.617Z",
+    "reporter": {
+      "id": "user-1757471509160",
+      "name": "Yousuf Sayyed",
+      "email": "yousufsayyed.cs@gmail.com",
+      "password": "123456",
+      "avatarUrl": "https://picsum.photos/seed/Yousuf Sayyed/40/40",
+      "karma": 0,
+      "civicScore": 0
+    },
+    "comments": []
+  },
+  {
     "id": "pune-1",
     "title": "Huge Pothole on FC Road",
     "description": "A massive pothole near Vaishali Restaurant is causing severe traffic backlog and is dangerous for two-wheelers. It has been there for over a week.",
@@ -8,7 +37,7 @@
     "status": "Open",
     "priority": "Medium",
     "priorityJustification": "Large pothole on a busy road poses a significant traffic hazard.",
-    "imageUrl": "https://picsum.photos/seed/potholefc/600/400",
+    "imageUrl": "https://picsum.photos/seed/pothole-road/600/400",
     "imageHint": "pothole road",
     "location": {
       "lat": 18.518,
@@ -39,7 +68,7 @@
     "status": "Open",
     "priority": "Medium",
     "priorityJustification": "Lack of lighting on a public road creates a safety risk for nighttime travel.",
-    "imageUrl": "https://picsum.photos/seed/darkroad/600/400",
+    "imageUrl": "https://picsum.photos/seed/dark-street/600/400",
     "imageHint": "dark street",
     "location": {
       "lat": 18.585,
@@ -70,7 +99,7 @@
     "status": "In Progress",
     "priority": "Medium",
     "priorityJustification": "Large accumulation of waste in a high-traffic public area poses a public health concern.",
-    "imageUrl": "https://picsum.photos/seed/garbagestation/600/400",
+    "imageUrl": "https://picsum.photos/seed/trash-pile/600/400",
     "imageHint": "trash pile",
     "location": {
       "lat": 18.528,
@@ -101,7 +130,7 @@
     "status": "Open",
     "priority": "High",
     "priorityJustification": "An open manhole poses an immediate and severe risk of injury to the public.",
-    "imageUrl": "https://picsum.photos/seed/openmanhole/600/400",
+    "imageUrl": "https://picsum.photos/seed/open-manhole/600/400",
     "imageHint": "open manhole",
     "location": {
       "lat": 18.505,
