@@ -1,2 +1,127 @@
 
-[]
+[
+  {
+    "id": "pune-1",
+    "title": "Huge Pothole on FC Road",
+    "description": "A massive pothole near Vaishali Restaurant is causing severe traffic backlog and is dangerous for two-wheelers. It has been there for over a week.",
+    "category": "Potholes / Damaged Road Surface",
+    "status": "Open",
+    "priority": "Medium",
+    "priorityJustification": "Large pothole on a busy road poses a significant traffic hazard.",
+    "imageUrl": "https://picsum.photos/seed/potholefc/600/400",
+    "imageHint": "pothole road",
+    "location": {
+      "lat": 18.518,
+      "lng": 73.844,
+      "address": "Fergusson College Rd, Deccan Gymkhana, Pune"
+    },
+    "votes": {
+      "up": 25,
+      "down": 2
+    },
+    "createdAt": "2024-05-28T10:00:00Z",
+    "reporter": {
+      "id": "user-1",
+      "name": "Aarav Sharma",
+      "email": "aarav.sharma@example.com",
+      "password": "123456",
+      "avatarUrl": "https://picsum.photos/seed/Aarav/40/40",
+      "karma": 0,
+      "civicScore": 0
+    },
+    "comments": []
+  },
+  {
+    "id": "wagholi-1",
+    "title": "No Streetlights on Kesnand Road, Wagholi",
+    "description": "The entire stretch of Kesnand Road from the main highway turning is pitch dark. It feels extremely unsafe to travel here after 7 PM. Many streetlights are fused.",
+    "category": "Malfunctioning or Broken Streetlights",
+    "status": "Open",
+    "priority": "Medium",
+    "priorityJustification": "Lack of lighting on a public road creates a safety risk for nighttime travel.",
+    "imageUrl": "https://picsum.photos/seed/darkroad/600/400",
+    "imageHint": "dark street",
+    "location": {
+      "lat": 18.585,
+      "lng": 73.97,
+      "address": "Kesnand Road, Wagholi, Pune"
+    },
+    "votes": {
+      "up": 45,
+      "down": 0
+    },
+    "createdAt": "2024-05-29T19:30:00Z",
+    "reporter": {
+      "id": "user-2",
+      "name": "Priya Patel",
+      "email": "priya.patel@example.com",
+      "password": "123456",
+      "avatarUrl": "https://picsum.photos/seed/Priya/40/40",
+      "karma": 0,
+      "civicScore": 0
+    },
+    "comments": []
+  },
+  {
+    "id": "pune-2",
+    "title": "Garbage Dumped near Pune Station",
+    "description": "There is a huge pile of garbage overflowing from the bins right outside the main entrance of Pune Railway Station. The smell is unbearable and it looks terrible.",
+    "category": "Garbage Dump / Overflowing Bins",
+    "status": "In Progress",
+    "priority": "Medium",
+    "priorityJustification": "Large accumulation of waste in a high-traffic public area poses a public health concern.",
+    "imageUrl": "https://picsum.photos/seed/garbagestation/600/400",
+    "imageHint": "trash pile",
+    "location": {
+      "lat": 18.528,
+      "lng": 73.873,
+      "address": "Pune Railway Station, Agarkar Nagar, Pune"
+    },
+    "votes": {
+      "up": 18,
+      "down": 1
+    },
+    "createdAt": "2024-05-27T08:00:00Z",
+    "reporter": {
+      "id": "user-3",
+      "name": "Rohan Mehta",
+      "email": "rohan.mehta@example.com",
+      "password": "123456",
+      "avatarUrl": "https://picsum.photos/seed/Rohan/40/40",
+      "karma": 0,
+      "civicScore": 0
+    },
+    "comments": []
+  },
+  {
+    "id": "pune-8",
+    "title": "Open Manhole on Karve Road",
+    "description": "An open manhole without any warning signs is present on the footpath of the busy Karve Road. It is extremely dangerous for pedestrians, especially at night.",
+    "category": "Open Manhole or Drain Cover",
+    "status": "Open",
+    "priority": "High",
+    "priorityJustification": "An open manhole poses an immediate and severe risk of injury to the public.",
+    "imageUrl": "https://picsum.photos/seed/openmanhole/600/400",
+    "imageHint": "open manhole",
+    "location": {
+      "lat": 18.505,
+      "lng": 73.832,
+      "address": "Karve Road, Kothrud, Pune"
+    },
+    "votes": {
+      "up": 55,
+      "down": 0
+    },
+    "createdAt": "2024-05-31T09:00:00Z",
+    "reporter": {
+      "id": "user-1",
+      "name": "Aarav Sharma",
+      "email": "aarav.sharma@example.com",
+      "password": "123456",
+      "avatarUrl": "https://picsum.photos/seed/Aarav/40/40",
+      "karma": 0,
+      "civicScore": 0
+    },
+    "comments": []
+  }
+]

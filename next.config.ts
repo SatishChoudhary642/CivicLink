@@ -1,7 +1,6 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: true,
@@ -25,6 +24,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
+  // Fix for your cross-origin warning:
+  allowedDevOrigins: ['*.cloudworkstations.dev'],
 };
 
 export default nextConfig;
