@@ -62,11 +62,11 @@ const prompt = ai.definePrompt({
   - Many "Illegal Parking" reports in a commercial area could indicate a lack of sufficient public parking.
 
   Based on your analysis of the issue data, identify up to 3 major infrastructure gaps. For each gap, provide:
-  1.  `problemArea`: The specific neighborhood or location.
-  2.  `problemType`: The general category of the problem.
-  3.  `suggestion`: A concrete, actionable suggestion for the city.
-  4.  `supportingIssueIds`: A few example issue IDs that support your conclusion.
-  5.  `reasoning`: A short justification for your analysis.
+  1.  \`problemArea\`: The specific neighborhood or location.
+  2.  \`problemType\`: The general category of the problem.
+  3.  \`suggestion\`: A concrete, actionable suggestion for the city.
+  4.  \`supportingIssueIds\`: A few example issue IDs that support your conclusion.
+  5.  \`reasoning\`: A short justification for your analysis.
 
   Here is the list of issues to analyze:
   {{#each issues}}
