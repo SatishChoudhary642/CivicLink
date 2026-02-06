@@ -1,11 +1,6 @@
-import { getIssues } from '@/lib/data';
 import { IssueFeed } from '@/components/feed/IssueFeed';
 
-// This is now a Server Component
-export default async function Home() {
-  // Fetch initial issues on the server
-  const initialIssues = await getIssues();
-
+export default function Home() {
   return (
     <div className="bg-muted/40 min-h-screen">
       <div className="container mx-auto max-w-4xl p-4 md:p-8">
@@ -15,8 +10,7 @@ export default async function Home() {
             View, vote, and discuss civic issues in your community.
           </p>
         </header>
-        {/* Pass server-fetched data to the new Client Component */}
-        <IssueFeed initialIssues={initialIssues} />
+        <IssueFeed />
       </div>
     </div>
   );

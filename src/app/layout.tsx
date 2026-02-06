@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import { AuthProvider } from '@/context/AuthContext';
 import { IssueProvider } from '@/context/IssueContext';
 import { getUsers } from '@/lib/users';
+import { getIssues } from '@/lib/data';
 
 export const metadata: Metadata = {
   title: 'CivicLink',
@@ -17,6 +18,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const initialUsers = await getUsers();
+  const initialIssues = await getIssues();
 
   return (
     <html lang="en">
@@ -32,7 +34,7 @@ export default async function RootLayout({
           crossOrigin=""/>
       </head>
       <body className="font-body antialiased">
-        <IssueProvider initialUsers={initialUsers}>
+        <IssueProvider initialUsers={initialUsers} initialIssues={initialIssues}>
           <AuthProvider initialUsers={initialUsers}>
             <div className="flex min-h-screen flex-col">
             <Header />

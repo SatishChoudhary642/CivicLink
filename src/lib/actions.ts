@@ -1,9 +1,9 @@
-
 'use server';
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { categorizeUploadedImage } from '@/ai/flows/categorize-uploaded-image';
+import { predictIssuePriority } from '@/ai/flows/predict-issue-priority';
 import { getIssues, saveIssues } from '@/lib/data';
 import { getUsers, saveUsers } from '@/lib/users';
 import type { Issue, IssueCategory, User } from './types';
@@ -89,6 +89,21 @@ export async function createIssue(
         reporter: user,
         comments: [],
     };
+    
+    try {
+      const priorityPrediction = await predictIssuePriority({ 
+        title: newIssue.title, 
+        description: newIssue.description, 
+        category: newIssue.category 
+      });
+
+      if (priorityPrediction.priority) {
+        newIssue.priority = priorityPrediction.priority;
+        newIssue.justification = priorityPrediction.justification;
+      }
+    } catch (e) {
+      console.error('Could not predict priority:', e);
+    }
 
     try {
       const issues = await getIssues();
@@ -138,8 +153,8 @@ export async function signupUser(
       email,
       password, // Save the password
       avatarUrl: `https://picsum.photos/seed/${name}/40/40`,
-      karma: 0,
       civicScore: 0,
+      karma: 0,
   };
 
   try {

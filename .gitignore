@@ -43,3 +43,8 @@ next-env.d.ts
 # firebase
 firebase-debug.log
 firestore-debug.log
+
+# --- Added for Firebase ---
+.firebase/
+.runtimeconfig.json
+functions/node_modules

@@ -1,9 +1,7 @@
-
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import type { Issue, IssueCategory, User } from '@/lib/types';
-
 
 export const issueCategories: IssueCategory[] = [
     "Garbage Dump / Overflowing Bins",
@@ -32,7 +30,6 @@ export const issueCategories: IssueCategory[] = [
     "Other",
 ];
 
-// Context type
 interface IssueContextType {
   issues: Issue[];
   setIssues: React.Dispatch<React.SetStateAction<Issue[]>>;
@@ -42,17 +39,16 @@ interface IssueContextType {
   getIssueById: (id: string) => Issue | undefined;
 }
 
-// Create context
 const IssueContext = createContext<IssueContextType | undefined>(undefined);
 
 interface IssueProviderProps {
   children: ReactNode;
   initialUsers: User[];
+  initialIssues: Issue[];
 }
 
-// Provider component
-export const IssueProvider: React.FC<IssueProviderProps> = ({ children, initialUsers }) => {
-  const [issues, setIssues] = useState<Issue[]>([]);
+export const IssueProvider: React.FC<IssueProviderProps> = ({ children, initialUsers, initialIssues }) => {
+  const [issues, setIssues] = useState<Issue[]>(initialIssues);
   const [users, setUsers] = useState<User[]>(initialUsers);
 
   const addIssue = useCallback((newIssue: Issue) => {
@@ -87,7 +83,6 @@ export const IssueProvider: React.FC<IssueProviderProps> = ({ children, initialU
   );
 };
 
-// Custom hook to use the context
 export const useIssues = () => {
   const context = useContext(IssueContext);
   if (context === undefined) {

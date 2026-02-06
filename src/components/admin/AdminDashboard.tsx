@@ -4,7 +4,6 @@
 import { useState, useEffect, useMemo } from "react";
 import type { Issue, IssueStatus, Priority } from "@/lib/types";
 import { issueCategories } from "@/context/IssueContext";
-import { predictIssuePriority } from "@/ai/flows/predict-issue-priority";
 import { analyzeInfrastructureGaps, type AnalyzeInfrastructureGapsOutput } from "@/ai/flows/analyze-infrastructure-gaps";
 import {
   Select,
@@ -38,7 +37,6 @@ interface AdminDashboardProps {
 
 export function AdminDashboard({ allIssues }: AdminDashboardProps) {
   const { updateIssue } = useIssues();
-  const [issuesWithPriority, setIssuesWithPriority] = useState<Issue[]>(allIssues);
   const [statusFilter, setStatusFilter] = useState<string>("All");
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
   const [priorityFilter, setPriorityFilter] = useState<string>("All");
@@ -48,48 +46,11 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(true);
 
   useEffect(() => {
-    setIssuesWithPriority(allIssues);
     if (allIssues.length > 0 && selectedIssue) {
         const updatedSelectedIssue = allIssues.find(i => i.id === selectedIssue.id);
         setSelectedIssue(updatedSelectedIssue || null);
     }
     
-    const assessPriorities = async () => {
-      const issuesToAssess = allIssues.filter(issue => !issue.priority);
-      if (issuesToAssess.length === 0) return;
-
-      const priorityPromises = issuesToAssess.map(issue => 
-        predictIssuePriority({
-          title: issue.title,
-          description: issue.description,
-          category: issue.category
-        }).then(priorityResult => ({
-          issueId: issue.id,
-          ...priorityResult
-        }))
-      );
-
-      const results = await Promise.all(priorityPromises);
-
-      const newIssues = allIssues.map(issue => {
-        const foundResult = results.find(res => res.issueId === issue.id);
-        if (foundResult) {
-          const updatedIssue = {
-            ...issue,
-            priority: foundResult.priority,
-            priorityJustification: foundResult.justification
-          };
-          updateIssue(issue.id, { 
-            priority: foundResult.priority, 
-            priorityJustification: foundResult.justification 
-          });
-          return updatedIssue;
-        }
-        return issue;
-      });
-      setIssuesWithPriority(newIssues);
-    };
-
     const runInfrastructureAnalysis = async () => {
         setIsAnalyzing(true);
         try {
@@ -103,23 +64,22 @@ export function AdminDashboard({ allIssues }: AdminDashboardProps) {
         }
     };
 
-    assessPriorities();
     runInfrastructureAnalysis();
 
-  }, [allIssues, updateIssue, selectedIssue]);
+  }, [allIssues, selectedIssue]);
   
   const statuses: IssueStatus[] = ["Open", "In Progress", "Resolved", "Rejected"];
   const priorities: Priority[] = ["High", "Medium", "Low"];
 
   const filteredIssues = useMemo(() => {
-    return issuesWithPriority.filter((issue) => {
+    return allIssues.filter((issue) => {
       const statusMatch = statusFilter === "All" || issue.status === statusFilter;
       const categoryMatch = categoryFilter === "All" || issue.category === categoryFilter;
       const priorityMatch = priorityFilter === "All" || issue.priority === priorityFilter;
       const searchMatch = !searchQuery || issue.title.toLowerCase().includes(searchQuery.toLowerCase());
       return statusMatch && categoryMatch && priorityMatch && searchMatch;
     });
-  }, [issuesWithPriority, statusFilter, categoryFilter, priorityFilter, searchQuery]);
+  }, [allIssues, statusFilter, categoryFilter, priorityFilter, searchQuery]);
   
   useEffect(() => {
     if (selectedIssue && !filteredIssues.some(issue => issue.id === selectedIssue.id)) {
